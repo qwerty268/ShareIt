@@ -4,11 +4,10 @@ import lombok.Data;
 import qwerty268.ShareIt.item.Item;
 import qwerty268.ShareIt.user.User;
 
-import java.time.LocalDate;
 import java.util.Date;
 
 @Data
-public class Booking {
+public class BookingDTO {
     private Long id;
     private Date start;
     private Date end;
@@ -16,4 +15,3 @@ public class Booking {
     private User booker;
     private Status status;
 }
-
