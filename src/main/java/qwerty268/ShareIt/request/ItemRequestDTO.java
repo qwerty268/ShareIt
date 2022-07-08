@@ -11,4 +11,11 @@ public class ItemRequestDTO {
     private String description;
     private User requestor;
     private Date created;
+
+    public ItemRequestDTO(Long id, String description, User requestor, Date created) {
+        this.id = id;
+        this.description = description;
+        this.requestor = requestor;
+        this.created = created;
+    }
 }
