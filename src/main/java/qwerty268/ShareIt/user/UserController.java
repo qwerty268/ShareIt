@@ -5,35 +5,41 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RestController
 public class UserController {
 
-    private final UserRepository repository;
+    private final UserService service;
 
     @Autowired
-    public UserController(UserRepository repository) {
-        this.repository = repository;
+    public UserController(UserService service) {
+        this.service = service;
     }
 
     @PostMapping("/users")
     public User addUser(@RequestBody User user) {
-        repository.save(user);
+        service.add(user);
         return user;
     }
 
-    @PutMapping("/users")
-    public User updateUser(@RequestBody User user) {
-        repository.update(user);
+    @PatchMapping("/users/{id}")
+    public User updateUser(@RequestBody User user, @PathVariable Long id) {
+        service.update(user, id);
         return user;
     }
 
     @GetMapping("/users")
-    public List<User> getUsers() {
-        return repository.getAll();
+    public List<UserDTO> getUsers() {
+        return service.getAll();
+    }
+
+    @DeleteMapping("/users/{id}")
+    public void deleteUser(@PathVariable Long id) {
+        service.deleteById(id);
     }
 
     @GetMapping("/users/{id}")
-    public User getUser(@PathVariable Long id) {
-        return repository.getById(id)
-                .orElseThrow();
+    public UserDTO getUser(@PathVariable Long id) {
+        return service.getById(id);
     }
+
 }
