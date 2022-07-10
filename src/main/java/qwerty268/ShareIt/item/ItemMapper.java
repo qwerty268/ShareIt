@@ -5,4 +5,25 @@ public class ItemMapper {
         return new ItemDTO(item.getId(), item.getName(), item.getDescription(), item.getAvailable(), item.getOwner(),
                 item.getRequest());
     }
+
+    public static Item update(Item notUpdatedItem, Item updatedItem) {
+        if (updatedItem.getName() == null) {
+            updatedItem.setName(notUpdatedItem.getName());
+        }
+        if (updatedItem.getDescription() == null) {
+            updatedItem.setDescription(notUpdatedItem.getDescription());
+        }
+        if (updatedItem.getAvailable() == null) {
+            updatedItem.setAvailable(notUpdatedItem.getAvailable());
+        }
+        if (updatedItem.getOwner() == null) {
+            updatedItem.setOwner(notUpdatedItem.getOwner());
+        }
+        if (updatedItem.getRequest() == null) {
+            updatedItem.setRequest(notUpdatedItem.getRequest());
+        }
+        updatedItem.setId(notUpdatedItem.getId());
+
+        return updatedItem;
+    }
 }

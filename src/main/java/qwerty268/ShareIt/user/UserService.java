@@ -5,8 +5,8 @@ import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import qwerty268.ShareIt.exception.InvalidArgsException;
-import qwerty268.ShareIt.exception.UserAlreadyExistException;
-import qwerty268.ShareIt.exception.UserDoesNotExistException;
+import qwerty268.ShareIt.user.exceptions.UserAlreadyExistException;
+import qwerty268.ShareIt.user.exceptions.UserDoesNotExistException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,14 +26,12 @@ public class UserService {
 
     public void add(User user) {
         validate(user);
-        throwExceptionIfAlreadyExist(user);
 
         addId(user);
         repository.save(user);
     }
 
     public void update(User user, Long userId) {
-        throwExceptionIfAlreadyExist(user);
 
         User notUpdatedUser = repository.getById(userId).orElseThrow(UserDoesNotExistException::new);
 
@@ -70,11 +68,14 @@ public class UserService {
         if (!EmailValidator.getInstance().isValid(user.getEmail())) {
             throw new InvalidArgsException();
         }
+
+       throwExceptionIfAlreadyExist(user);
+
     }
 
     private void throwExceptionIfAlreadyExist(User user) {
         repository.getAll().forEach((user1) -> {
-            if (Objects.equals(user1.getEmail(), user.getEmail())) {
+            if (Objects.equals(user1.getEmail(), user.getEmail()) && !Objects.equals(user1.getId(), user.getId())) {
                 throw new UserAlreadyExistException();
             }
         });
