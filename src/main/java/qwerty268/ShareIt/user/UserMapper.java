@@ -8,6 +8,11 @@ public class UserMapper {
         return new UserDTO(user.getId(), user.getName(), user.getEmail());
     }
 
+    public static User fromDTO(UserDTO userDTO) {
+        return new User(userDTO.getId(), userDTO.getName(), userDTO.getEmail());
+    }
+
+
     public static User updateUser(User notUpdatedUser, User updatedUser) {
 
         if (updatedUser.getEmail() == null) {

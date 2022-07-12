@@ -10,4 +10,13 @@ public class Item {
     private Boolean available;
     private String owner;
     private String request;
+
+    public Item(Long id, String name, String description, Boolean available, String owner, String request) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.available = available;
+        this.owner = owner;
+        this.request = request;
+    }
 }

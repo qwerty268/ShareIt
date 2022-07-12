@@ -24,14 +24,19 @@ public class UserService {
     }
 
 
-    public void add(User user) {
+    public UserDTO add(UserDTO userDTO) {
+        User user = UserMapper.fromDTO(userDTO);
+
         validate(user);
 
         addId(user);
         repository.save(user);
+
+        return UserMapper.toDTO(user);
     }
 
-    public void update(User user, Long userId) {
+    public UserDTO update(UserDTO userDTO, Long userId) {
+        User user = UserMapper.fromDTO(userDTO);
 
         User notUpdatedUser = repository.getById(userId).orElseThrow(UserDoesNotExistException::new);
 
@@ -40,6 +45,8 @@ public class UserService {
         validate(updatedUser);
 
         repository.update(updatedUser);
+
+        return UserMapper.toDTO(updatedUser);
     }
 
     public List<UserDTO> getAll() {

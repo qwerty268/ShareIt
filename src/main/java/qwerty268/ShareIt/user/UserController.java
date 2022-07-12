@@ -16,15 +16,13 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public User addUser(@RequestBody User user) {
-        service.add(user);
-        return user;
+    public UserDTO addUser(@RequestBody UserDTO userDTO) {
+        return service.add(userDTO);
     }
 
     @PatchMapping("/users/{id}")
-    public User updateUser(@RequestBody User user, @PathVariable Long id) {
-        service.update(user, id);
-        return user;
+    public UserDTO updateUser(@RequestBody UserDTO userDTO, @PathVariable Long id) {
+        return service.update(userDTO, id);
     }
 
     @GetMapping("/users")

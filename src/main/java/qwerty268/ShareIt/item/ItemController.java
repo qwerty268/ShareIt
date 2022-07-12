@@ -16,13 +16,13 @@ public class ItemController {
     }
 
     @PostMapping("/items")
-    public ItemDTO saveItem(@RequestBody Item item, @RequestHeader("X-Sharer-User-Id") Long userId) {
-        return service.save(item, userId);
+    public ItemDTO saveItem(@RequestBody ItemDTO itemDTO, @RequestHeader("X-Sharer-User-Id") Long userId) {
+        return service.save(itemDTO, userId);
     }
 
     @PatchMapping("/items/{id}")
-    public ItemDTO updateItem(@PathVariable Long id, @RequestBody Item item, @RequestHeader("X-Sharer-User-Id") Long userId) {
-        return service.update(item, userId, id);
+    public ItemDTO updateItem(@PathVariable Long id, @RequestBody ItemDTO itemDTO, @RequestHeader("X-Sharer-User-Id") Long userId) {
+        return service.update(itemDTO, userId, id);
     }
 
     @GetMapping("/items")

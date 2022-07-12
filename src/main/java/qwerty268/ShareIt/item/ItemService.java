@@ -25,7 +25,9 @@ public class ItemService {
         this.userRepository = userRepository;
     }
 
-    public ItemDTO save(Item item, Long userId) {
+    public ItemDTO save(ItemDTO itemDTO, Long userId) {
+        Item item = ItemMapper.fromDTO(itemDTO);
+
         userRepository.getById(userId).orElseThrow(UserDoesNotExistException::new);
         validate(item);
         addId(item);
@@ -34,7 +36,9 @@ public class ItemService {
         return ItemMapper.toDTO(item);
     }
 
-    public ItemDTO update(Item item, Long userId, Long itemId) {
+    public ItemDTO update(ItemDTO itemDTO, Long userId, Long itemId) {
+        Item item = ItemMapper.fromDTO(itemDTO);
+
         Item notUpdatedItem = itemRepository.findById(itemId, userId).orElseThrow(InvalidOwnerOfItemException::new);
 
         Item updatedItem = ItemMapper.update(notUpdatedItem, item);
@@ -61,7 +65,7 @@ public class ItemService {
 
 
         for (Item item : items) {
-            if (item.getId() == itemId) {
+            if (Objects.equals(item.getId(), itemId)) {
                 return ItemMapper.toDTO(item);
             }
         }

@@ -6,6 +6,11 @@ public class ItemMapper {
                 item.getRequest());
     }
 
+    public static Item fromDTO(ItemDTO itemDTO) {
+        return new Item(itemDTO.getId(), itemDTO.getName(), itemDTO.getDescription(), itemDTO.getAvailable(), itemDTO.getOwner(),
+                itemDTO.getRequest());
+    }
+
     public static Item update(Item notUpdatedItem, Item updatedItem) {
         if (updatedItem.getName() == null) {
             updatedItem.setName(notUpdatedItem.getName());
