@@ -1,13 +1,17 @@
 package qwerty268.ShareIt.booking;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Data
 @Table(name = "Bookings")
+@Entity
+@NoArgsConstructor
 public class Booking {
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "start_date")
