@@ -26,7 +26,7 @@ public class ItemService {
     }
 
     public ItemDTO save(ItemDTO itemDTO, Long userId) {
-        Item item = ItemMapper.fromDTO(itemDTO);
+        Item item = ItemMapper.fromDTO(itemDTO, userId);
 
         userRepository.getById(userId).orElseThrow(UserDoesNotExistException::new);
         validate(item);
@@ -37,7 +37,7 @@ public class ItemService {
     }
 
     public ItemDTO update(ItemDTO itemDTO, Long userId, Long itemId) {
-        Item item = ItemMapper.fromDTO(itemDTO);
+        Item item = ItemMapper.fromDTO(itemDTO, userId);
 
         Item notUpdatedItem = itemRepository.findById(itemId, userId).orElseThrow(InvalidOwnerOfItemException::new);
 
@@ -85,7 +85,7 @@ public class ItemService {
         List<Item> items = itemRepository.findAll().stream().filter(item ->
                 (item.getDescription().toLowerCase().contains(text.toLowerCase()) ||
                         item.getName().toLowerCase().contains(text.toLowerCase()))
-                        && item.getAvailable()
+                        && item.getIsAvailable()
         ).collect(Collectors.toList());
 
         List<ItemDTO> itemDTOS = new ArrayList<>();
@@ -101,7 +101,7 @@ public class ItemService {
 
 
     private void validate(Item item) {
-        if (item.getAvailable() == null ||
+        if (item.getIsAvailable() == null ||
                 item.getName() == null ||
                 item.getName().isBlank() ||
                 item.getDescription() == null) {

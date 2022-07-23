@@ -2,13 +2,13 @@ package qwerty268.ShareIt.item;
 
 public class ItemMapper {
     public static ItemDTO toDTO(Item item) {
-        return new ItemDTO(item.getId(), item.getName(), item.getDescription(), item.getAvailable(), item.getOwner(),
-                item.getRequest());
+        return new ItemDTO(item.getId(), item.getName(), item.getDescription(), item.getIsAvailable(), item.getOwnerId(),
+                item.getRequestId());
     }
 
-    public static Item fromDTO(ItemDTO itemDTO) {
-        return new Item(itemDTO.getId(), itemDTO.getName(), itemDTO.getDescription(), itemDTO.getAvailable(), itemDTO.getOwner(),
-                itemDTO.getRequest());
+    public static Item fromDTO(ItemDTO itemDTO, final Long ownerId) {
+        return new Item(itemDTO.getId(), itemDTO.getName(), itemDTO.getDescription(), itemDTO.getIsAvailable(), ownerId,
+                itemDTO.getRequestId());
     }
 
     public static Item update(Item notUpdatedItem, Item updatedItem) {
@@ -18,14 +18,14 @@ public class ItemMapper {
         if (updatedItem.getDescription() == null) {
             updatedItem.setDescription(notUpdatedItem.getDescription());
         }
-        if (updatedItem.getAvailable() == null) {
-            updatedItem.setAvailable(notUpdatedItem.getAvailable());
+        if (updatedItem.getIsAvailable() == null) {
+            updatedItem.setIsAvailable(notUpdatedItem.getIsAvailable());
         }
-        if (updatedItem.getOwner() == null) {
-            updatedItem.setOwner(notUpdatedItem.getOwner());
+        if (updatedItem.getOwnerId() == null) {
+            updatedItem.setOwnerId(notUpdatedItem.getOwnerId());
         }
-        if (updatedItem.getRequest() == null) {
-            updatedItem.setRequest(notUpdatedItem.getRequest());
+        if (updatedItem.getRequestId() == null) {
+            updatedItem.setRequestId(notUpdatedItem.getRequestId());
         }
         updatedItem.setId(notUpdatedItem.getId());
 

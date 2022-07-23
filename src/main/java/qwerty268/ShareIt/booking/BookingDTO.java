@@ -11,16 +11,16 @@ public class BookingDTO {
     private Long id;
     private Date start;
     private Date end;
-    private Item item;
-    private User booker;
+    private Long itemId;
+    private Long bookerId;
     private Status status;
 
-    public BookingDTO(Long id, Date start, Date end, Item item, User booker, Status status) {
+    public BookingDTO(Long id, Date start, Date end, Long itemId, Long bookerId, Status status) {
         this.id = id;
         this.start = start;
         this.end = end;
-        this.item = item;
-        this.booker = booker;
+        this.itemId = itemId;
+        this.bookerId = bookerId;
         this.status = status;
     }
 }
