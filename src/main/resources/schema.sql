@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS Items
     id           int8 GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name         VARCHAR(40),
     description  TEXT,
-    is_available BOOLEAN,
+    is_available BOOLEAN DEFAULT TRUE,
     request_id   int8,
     owner_id     int8 REFERENCES Users (id)
 );

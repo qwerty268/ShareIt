@@ -1,20 +1,18 @@
 package qwerty268.ShareIt.item;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+
 import java.util.List;
 import java.util.Optional;
 
-public interface ItemRepository {
 
-    void save(Item item, Long userId);
-    Optional<Item> findById(Long itemId, Long userId);
+public interface ItemRepository extends JpaRepository<Item, Long> {
+    Optional<Item> findItemById(Long itemId);
 
-    void update(Item item, Long userId);
+    List<Item> findItemsByOwnerId(Long ownerId);
 
-    //поиск всех вещей пользователя
-    List<Item> findAllItemsOfUser(Long userId);
+    void deleteById(Long itemId);
 
-    List<Item> findAll();
+    List<Item> findItemsByDescriptionIgnoreCaseAndNameIgnoreCaseAndIsAvailableTrue(String description, String name);
 
-
-    void deleteById(Long itemId, Long userId);
 }

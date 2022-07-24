@@ -4,77 +4,61 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import qwerty268.ShareIt.exception.InvalidArgsException;
 import qwerty268.ShareIt.item.exceptions.InvalidOwnerOfItemException;
-import qwerty268.ShareIt.user.exceptions.UserDoesNotExistException;
-import qwerty268.ShareIt.user.UserRepository;
+import qwerty268.ShareIt.item.exceptions.ItemNotFoundException;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 public class ItemService {
     private final ItemRepository itemRepository;
-    private final UserRepository userRepository;
-    private Long id = 1L;
+
 
     @Autowired
-    public ItemService(ItemRepository itemRepository, UserRepository userRepository) {
+    public ItemService(ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
-        this.userRepository = userRepository;
     }
 
+    @Transactional
     public ItemDTO save(ItemDTO itemDTO, Long userId) {
         Item item = ItemMapper.fromDTO(itemDTO, userId);
+        item.setOwnerId(userId);
+        validate(item, userId);
 
-        userRepository.getById(userId).orElseThrow(UserDoesNotExistException::new);
-        validate(item);
-        addId(item);
-
-        itemRepository.save(item, userId);
+        item = itemRepository.save(item);
         return ItemMapper.toDTO(item);
     }
 
+    @Transactional
     public ItemDTO update(ItemDTO itemDTO, Long userId, Long itemId) {
         Item item = ItemMapper.fromDTO(itemDTO, userId);
-
-        Item notUpdatedItem = itemRepository.findById(itemId, userId).orElseThrow(InvalidOwnerOfItemException::new);
-
+        Item notUpdatedItem = itemRepository.findById(itemId).orElseThrow(InvalidOwnerOfItemException::new);
         Item updatedItem = ItemMapper.update(notUpdatedItem, item);
 
-        itemRepository.update(updatedItem, userId);
+        validate(item, userId);
+
+        itemRepository.save(updatedItem);
         return ItemMapper.toDTO(updatedItem);
     }
 
     public List<ItemDTO> findAll(Long userId) {
         List<ItemDTO> itemDTOS = new ArrayList<>();
-        itemRepository.findAllItemsOfUser(userId).forEach((item) -> itemDTOS.add(ItemMapper.toDTO(item)));
+        itemRepository.findItemsByOwnerId(userId).forEach((item) -> itemDTOS.add(ItemMapper.toDTO(item)));
 
         return itemDTOS;
     }
 
-    public ItemDTO findById(Long itemId, Long userId) {
-        Item item = itemRepository.findById(itemId, userId).orElseThrow();
+
+    public ItemDTO findById(Long itemId) {
+        Item item = itemRepository.findItemById(itemId).orElseThrow(ItemNotFoundException::new);
 
         return ItemMapper.toDTO(item);
     }
 
-    public ItemDTO findById(Long itemId) {
-        List<Item> items = itemRepository.findAll();
-
-
-        for (Item item : items) {
-            if (Objects.equals(item.getId(), itemId)) {
-                return ItemMapper.toDTO(item);
-            }
-        }
-
-        return null;
-    }
-
-    public void deleteById(Long itemId, Long userId) {
-        itemRepository.deleteById(itemId, userId);
+    public void deleteById(Long itemId) {
+        itemRepository.deleteById(itemId);
     }
 
     public List<ItemDTO> findItemsByParam(String text) {
@@ -82,11 +66,7 @@ public class ItemService {
             return List.of();
         }
 
-        List<Item> items = itemRepository.findAll().stream().filter(item ->
-                (item.getDescription().toLowerCase().contains(text.toLowerCase()) ||
-                        item.getName().toLowerCase().contains(text.toLowerCase()))
-                        && item.getIsAvailable()
-        ).collect(Collectors.toList());
+        List<Item> items = itemRepository.findItemsByDescriptionIgnoreCaseAndNameIgnoreCaseAndIsAvailableTrue(text, text);
 
         List<ItemDTO> itemDTOS = new ArrayList<>();
         items.forEach(item -> itemDTOS.add(ItemMapper.toDTO(item)));
@@ -94,17 +74,12 @@ public class ItemService {
         return itemDTOS;
     }
 
-    private void addId(Item item) {
-        item.setId(id);
-        id++;
-    }
 
-
-    private void validate(Item item) {
-        if (item.getIsAvailable() == null ||
-                item.getName() == null ||
+    private void validate(Item item, Long userId) {
+        if (item.getName() == null ||
                 item.getName().isBlank() ||
-                item.getDescription() == null) {
+                item.getDescription() == null ||
+                !Objects.equals(item.getOwnerId(), userId)) {
             throw new InvalidArgsException();
         }
     }

@@ -13,7 +13,7 @@ public class UserMapper {
     }
 
 
-    public static User updateUser(User notUpdatedUser, User updatedUser) {
+    public static void updateUser(User notUpdatedUser, User updatedUser) {
 
         if (updatedUser.getEmail() == null) {
             updatedUser.setEmail(notUpdatedUser.getEmail());
@@ -24,7 +24,5 @@ public class UserMapper {
         }
 
         updatedUser.setId(notUpdatedUser.getId());
-
-        return updatedUser;
     }
 }

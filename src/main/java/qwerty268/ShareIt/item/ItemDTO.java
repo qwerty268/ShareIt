@@ -1,8 +1,10 @@
 package qwerty268.ShareIt.item;
 
 import lombok.Data;
+import qwerty268.ShareIt.booking.BookingDTO;
 
 import javax.persistence.Column;
+import javax.persistence.Table;
 
 @Data
 public class ItemDTO {
@@ -24,4 +26,5 @@ public class ItemDTO {
         this.requestId = requestId;
         this.ownerId = ownerId;
     }
+
 }

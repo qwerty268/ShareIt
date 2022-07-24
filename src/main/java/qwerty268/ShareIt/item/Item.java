@@ -1,5 +1,6 @@
 package qwerty268.ShareIt.item;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

@@ -37,7 +37,7 @@ public class ItemController {
 
     @DeleteMapping("/items/{id}")
     public void deleteItem(@PathVariable Long id, @RequestHeader("X-Sharer-User-Id") Long userId) {
-        service.deleteById(id, userId);
+        service.deleteById(id);
     }
 
     @GetMapping("/items/search")
