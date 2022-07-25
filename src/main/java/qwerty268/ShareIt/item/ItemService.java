@@ -66,7 +66,7 @@ public class ItemService {
             return List.of();
         }
 
-        List<Item> items = itemRepository.findItemsByDescriptionIgnoreCaseAndNameIgnoreCaseAndIsAvailableTrue(text, text);
+        List<Item> items = itemRepository.search(text, text);
 
         List<ItemDTO> itemDTOS = new ArrayList<>();
         items.forEach(item -> itemDTOS.add(ItemMapper.toDTO(item)));
