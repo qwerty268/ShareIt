@@ -19,7 +19,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query(value = "SELECT * FROM Bookings AS b" +
             " WHERE b.status = ?1 and b.booker_id = ?2",
             nativeQuery = true)
-    List<Booking> findBookingsByStatusEqualsIgnoreCaseAndBookerId(String state, Long bookerId);
+    List<Booking> findBookingsByStatusEqualsIgnoreCaseAndBookerId(Status status, Long bookerId);
 
     List<Booking> findBookingsByItemIdIn(Collection<Long> ids);
 
@@ -34,5 +34,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query(value = "SELECT * FROM Bookings AS b" +
             " WHERE b.status = ?1 and b.item_id in (SELECT i.id FROM Items AS i WHERE i.owner_id = ?2)",
             nativeQuery = true)
-    List<Booking> findBookingsByStatusEqualsIgnoreCaseAndItemIdIn(String state, Long userId);
+    List<Booking> findBookingsByStatusAndOwnerId(String state, Long ownerId);
+
+
+    @Query(value = "SELECT * FROM Bookings AS b" +
+            " WHERE b.status = 'APPROVED' and b.item_id in (SELECT i.id FROM Items AS i WHERE i.owner_id = ?2)" +
+            " and b.start_date < CURRENT_TIMESTAMP AND b.end_date > CURRENT_TIMESTAMP",
+            nativeQuery = true)
+    List<Booking> findApprovedBookingsForOwner(Long ownerId);
+
+    Booking findBookingsByItemIdAndBookerIdAndStatus(Long itemId, Long bookerId, Status status);
 }

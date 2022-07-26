@@ -2,6 +2,8 @@ package qwerty268.ShareIt.item;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import qwerty268.ShareIt.comment.Comment;
+import qwerty268.ShareIt.comment.CommentDTO;
 
 import java.util.List;
 
@@ -16,32 +18,43 @@ public class ItemController {
     }
 
     @PostMapping("/items")
+    @ResponseBody
     public ItemDTO saveItem(@RequestBody ItemDTO itemDTO, @RequestHeader("X-Sharer-User-Id") Long userId) {
         return service.save(itemDTO, userId);
     }
 
     @PatchMapping("/items/{id}")
+    @ResponseBody
     public ItemDTO updateItem(@PathVariable Long id, @RequestBody ItemDTO itemDTO, @RequestHeader("X-Sharer-User-Id") Long userId) {
         return service.update(itemDTO, userId, id);
     }
 
     @GetMapping("/items")
-    public List<ItemDTO> findItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    @ResponseBody
+    public List<ItemWithBookingDatesAndCommentsDTO> findItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
         return service.findAll(userId);
     }
 
-    @GetMapping("/items/{id}")
-    public ItemDTO getItem(@PathVariable Long id) {
-        return service.findById(id);
+    @GetMapping("/items/{itemId}")
+    @ResponseBody
+    public ItemWithCommentsDTO getItem(@PathVariable Long itemId) {
+        return service.findById(itemId);
     }
 
-    @DeleteMapping("/items/{id}")
-    public void deleteItem(@PathVariable Long id, @RequestHeader("X-Sharer-User-Id") Long userId) {
-        service.deleteById(id);
+    @DeleteMapping("/items/{itemId}")
+    public void deleteItem(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId) {
+        service.deleteById(itemId, userId);
     }
 
     @GetMapping("/items/search")
+    @ResponseBody
     public List<ItemDTO> findItems(@RequestParam String text) {
         return service.findItemsByParam(text);
+    }
+
+    @PostMapping("/items/{itemId}/comment")
+    @ResponseBody
+    public CommentDTO addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody CommentDTO commentDTO) {
+        return service.addComment(commentDTO, userId);
     }
 }

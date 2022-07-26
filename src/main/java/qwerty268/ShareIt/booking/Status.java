@@ -1,6 +1,6 @@
 package qwerty268.ShareIt.booking;
 
-enum Status {
+public enum Status {
     WAITING,
     APPROVED,
     REJECTED,

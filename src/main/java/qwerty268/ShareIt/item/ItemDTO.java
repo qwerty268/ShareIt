@@ -1,21 +1,16 @@
 package qwerty268.ShareIt.item;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import qwerty268.ShareIt.booking.BookingDTO;
-
-import javax.persistence.Column;
-import javax.persistence.Table;
 
 @Data
 public class ItemDTO {
     private Long id;
     private String name;
     private String description;
-
+    @JsonProperty("available")
     private Boolean isAvailable;
     private Long requestId;
-
-
     private Long ownerId;
 
     public ItemDTO(Long id, String name, String description, Boolean isAvailable, Long requestId, Long ownerId) {

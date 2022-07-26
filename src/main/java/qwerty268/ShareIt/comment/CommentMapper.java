@@ -1,13 +1,16 @@
 package qwerty268.ShareIt.comment;
 
-import qwerty268.ShareIt.user.UserDTO;
+import java.time.Instant;
+import java.util.Date;
 
 public class CommentMapper {
     public static CommentDTO toDTO(Comment comment) {
-        return new CommentDTO(comment.getId(), comment.getText(), comment.getItemId(), comment.getAuthorId());
+        return new CommentDTO(comment.getId(), comment.getText(), comment.getItemId(), comment.getAuthorId(),
+                comment.getCreated());
     }
 
     public static Comment fromDTO(CommentDTO commentDTO) {
-        return new Comment(commentDTO.getId(), commentDTO.getText(), commentDTO.getItemId(), commentDTO.getAuthorId());
+        return new Comment(commentDTO.getId(), commentDTO.getText(), commentDTO.getItemId(), commentDTO.getAuthorId(),
+                Date.from(Instant.now()));
     }
 }
