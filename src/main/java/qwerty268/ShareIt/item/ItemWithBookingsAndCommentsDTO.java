@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import qwerty268.ShareIt.booking.Booking;
 import qwerty268.ShareIt.comment.Comment;
+import qwerty268.ShareIt.comment.CommentDTO;
 
 import java.util.List;
 
@@ -20,5 +21,5 @@ public class ItemWithBookingsAndCommentsDTO {
     private Long ownerId;
     private Booking lastBooking;
     private Booking nextBooking;
-    private List<Comment> comments;
+    private List<CommentDTO> comments;
 }

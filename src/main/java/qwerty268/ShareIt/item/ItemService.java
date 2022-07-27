@@ -9,7 +9,7 @@ public interface ItemService {
 
     ItemDTO update(ItemDTO itemDTO, Long userId, Long itemId);
 
-    List<ItemWithBookingDatesAndCommentsDTO> findAll(Long userId);
+    List<ItemWithBookingsAndCommentsDTO> findAll(Long userId);
 
     ItemWithBookingsAndCommentsDTO findById(Long itemId, Long bookerId);
 
@@ -17,5 +17,5 @@ public interface ItemService {
 
     List<ItemDTO> findItemsByParam(String text);
 
-    CommentDTO addComment(CommentDTO commentDTO, Long userId);
+    CommentDTO addComment(CommentDTO commentDTO, Long userId, Long itemId);
 }

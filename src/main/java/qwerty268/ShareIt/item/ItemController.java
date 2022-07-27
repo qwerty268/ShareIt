@@ -30,7 +30,7 @@ public class ItemController {
 
     @GetMapping("/items")
     @ResponseBody
-    public List<ItemWithBookingDatesAndCommentsDTO> findItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<ItemWithBookingsAndCommentsDTO> findItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
         return service.findAll(userId);
     }
 
@@ -53,7 +53,8 @@ public class ItemController {
 
     @PostMapping("/items/{itemId}/comment")
     @ResponseBody
-    public CommentDTO addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody CommentDTO commentDTO) {
-        return service.addComment(commentDTO, userId);
+    public CommentDTO addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody CommentDTO commentDTO,
+                                 @PathVariable Long itemId) {
+        return service.addComment(commentDTO, userId, itemId);
     }
 }

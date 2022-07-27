@@ -4,8 +4,8 @@ import java.time.Instant;
 import java.util.Date;
 
 public class CommentMapper {
-    public static CommentDTO toDTO(Comment comment) {
-        return new CommentDTO(comment.getId(), comment.getText(), comment.getItemId(), comment.getAuthorId(),
+    public static CommentDTO toDTO(Comment comment, String authorName) {
+        return new CommentDTO(comment.getId(), comment.getText(), comment.getItemId(), comment.getAuthorId(), authorName,
                 comment.getCreated());
     }
 

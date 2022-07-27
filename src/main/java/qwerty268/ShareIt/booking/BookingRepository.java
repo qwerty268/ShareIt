@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
@@ -43,7 +44,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             nativeQuery = true)
     Booking findApprovedBookingForOwnerByItemId(Long ownerId, Long itemId);
 
-    Booking findBookingsByItemIdAndBookerIdAndStatus(Long itemId, Long bookerId, Status status);
+    List<Booking> findBookingsByItemIdAndBookerIdAndStatusOrderByEndDesc(Long itemId, Long bookerId, Status status);
 
     @Query(value = "SELECT * FROM Bookings AS b" +
             " WHERE b.status = 'APPROVED' and b.item_id in (SELECT i.id FROM Items AS i WHERE i.owner_id = ?1)" +

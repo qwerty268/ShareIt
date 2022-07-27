@@ -3,6 +3,7 @@ package qwerty268.ShareIt.item;
 import lombok.Data;
 import qwerty268.ShareIt.booking.Booking;
 import qwerty268.ShareIt.comment.Comment;
+import qwerty268.ShareIt.comment.CommentDTO;
 
 import java.util.Date;
 import java.util.List;
@@ -43,7 +44,7 @@ public class ItemMapper {
     public static ItemWithBookingsAndCommentsDTO createDTOFromItemBookingsComments(Item item,
                                                                                    Booking lastBooking,
                                                                                    Booking nextBooking,
-                                                                                   List<Comment> comments) {
+                                                                                   List<CommentDTO> comments) {
         return new ItemWithBookingsAndCommentsDTO(item.getId(), item.getName(), item.getDescription(),
                 item.getIsAvailable(), item.getRequestId(), item.getOwnerId(), lastBooking, nextBooking,
                 comments);

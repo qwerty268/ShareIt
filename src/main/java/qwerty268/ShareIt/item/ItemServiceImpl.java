@@ -41,7 +41,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDTO save(ItemDTO itemDTO, Long userId) {
         Item item = ItemMapper.fromDTO(itemDTO, userId);
         item.setOwnerId(userId);
-        validate(item, userId);
+        validateItem(item, userId);
 
         item = itemRepository.save(item);
         return ItemMapper.toDTO(item);
@@ -54,23 +54,21 @@ public class ItemServiceImpl implements ItemService {
         Item notUpdatedItem = itemRepository.findById(itemId).orElseThrow(InvalidOwnerOfItemException::new);
         Item updatedItem = ItemMapper.update(notUpdatedItem, item);
 
-        validate(item, userId);
+        validateItem(item, userId);
 
         itemRepository.save(updatedItem);
         return ItemMapper.toDTO(updatedItem);
     }
 
     @Override
-    public List<ItemWithBookingDatesAndCommentsDTO> findAll(Long userId) {
+    public List<ItemWithBookingsAndCommentsDTO> findAll(Long userId) {
 
         List<Item> items = itemRepository.findItemsByOwnerId(userId);
 
-        List<ItemWithBookingDatesAndCommentsDTO> itemWithBookingDatesDTOS = new ArrayList<>();
+        List<ItemWithBookingsAndCommentsDTO> itemWithBookingDatesDTOS = new ArrayList<>();
 
         items.forEach(item -> {
-            itemWithBookingDatesDTOS.add(ItemMapper.createDTOFromItemBookingComments(item,
-                    bookingRepository.findApprovedBookingForOwnerByItemId(item.getOwnerId(), item.getId()),
-                    commentRepository.findCommentsByItemId(item.getId())));
+            itemWithBookingDatesDTOS.add(createDTO(item, userId));
         });
 
 
@@ -109,20 +107,32 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional
     @Override
-    public CommentDTO addComment(CommentDTO commentDTO, Long userId) {
+    public CommentDTO addComment(CommentDTO commentDTO, Long userId, Long itemId) {
         Comment comment = CommentMapper.fromDTO(commentDTO);
-        Booking booking = bookingRepository.findBookingsByItemIdAndBookerIdAndStatus(comment.getItemId(), userId,
-                Status.APPROVED);
+        comment.setItemId(itemId);
 
-        if (booking.getEnd().before(Date.from(Instant.now()))) {
+        validateComment(comment, userId);
+
+        List<Booking> bookings = bookingRepository
+                .findBookingsByItemIdAndBookerIdAndStatusOrderByEndDesc(comment.getItemId(), userId, Status.APPROVED);
+
+        if (bookings.size() == 0) {
+            throw new InvalidArgsException();
+        }
+        Booking booking = bookings.get(0);
+
+
+        if (booking.getStart().toInstant().isBefore(Instant.now())) {
             comment = commentRepository.save(comment);
+        } else {
+            throw new InvalidArgsException();
         }
 
 
-        return CommentMapper.toDTO(comment);
+        return CommentMapper.toDTO(comment, userRepository.findById(comment.getAuthorId()).get().getName());
     }
 
-    private void validate(Item item, Long userId) {
+    private void validateItem(Item item, Long userId) {
         userRepository.findById(userId).orElseThrow(InvalidOwnerOfItemException::new);
 
         if (item.getName() == null ||
@@ -133,6 +143,13 @@ public class ItemServiceImpl implements ItemService {
         }
         if (!Objects.equals(item.getOwnerId(), userId)) {
             throw new ItemNotFoundException();
+        }
+    }
+
+    private void validateComment(Comment comment, Long userId) {
+        userRepository.findById(userId).orElseThrow(InvalidArgsException::new);
+        if (comment.getText() == null || Objects.equals(comment.getText(), "")) {
+            throw new InvalidArgsException();
         }
     }
 
@@ -161,7 +178,15 @@ public class ItemServiceImpl implements ItemService {
                 lastBooking = booking;
             }
         }
+        List<CommentDTO> commentDTOS = new ArrayList<>();
+
+        List<Comment> comments = commentRepository.findCommentsByItemId(item.getId());
+
+        comments.forEach(comment -> commentDTOS.add(
+                CommentMapper.toDTO(comment, userRepository.findById(comment.getAuthorId()).get().getName())
+        ));
+
         return ItemMapper.createDTOFromItemBookingsComments(item, lastBooking, futureBooking,
-                commentRepository.findCommentsByItemId(item.getId()));
+                commentDTOS);
     }
 }
