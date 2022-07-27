@@ -34,5 +34,11 @@ public class Booking {
         this.bookerId = bookerId;
         this.status = status;
     }
+
+    public Booking(Long id, Date start, Date end) {
+        this.itemId = id;
+        this.start = start;
+        this.end = end;
+    }
 }
 

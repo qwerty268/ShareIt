@@ -11,7 +11,7 @@ public interface ItemService {
 
     List<ItemWithBookingDatesAndCommentsDTO> findAll(Long userId);
 
-    ItemWithCommentsDTO findById(Long itemId);
+    ItemWithBookingsAndCommentsDTO findById(Long itemId, Long bookerId);
 
     void deleteById(Long itemId, Long userId);
 

@@ -1,8 +1,10 @@
 package qwerty268.ShareIt.item;
 
+import lombok.Data;
 import qwerty268.ShareIt.booking.Booking;
 import qwerty268.ShareIt.comment.Comment;
 
+import java.util.Date;
 import java.util.List;
 
 public class ItemMapper {
@@ -38,15 +40,31 @@ public class ItemMapper {
         return updatedItem;
     }
 
-    public static ItemWithBookingDatesAndCommentsDTO createDTOFromItemAndBookingAndComments(Item item, Booking booking,
-                                                                                            List<Comment> comments) {
-        return new ItemWithBookingDatesAndCommentsDTO(item.getId(), item.getName(), item.getDescription(),
-                item.getIsAvailable(), item.getRequestId(), item.getOwnerId(), booking.getStart(), booking.getEnd(),
+    public static ItemWithBookingsAndCommentsDTO createDTOFromItemBookingsComments(Item item,
+                                                                                   Booking lastBooking,
+                                                                                   Booking nextBooking,
+                                                                                   List<Comment> comments) {
+        return new ItemWithBookingsAndCommentsDTO(item.getId(), item.getName(), item.getDescription(),
+                item.getIsAvailable(), item.getRequestId(), item.getOwnerId(), lastBooking, nextBooking,
                 comments);
     }
 
     public static ItemWithCommentsDTO createDTOFromItemAndComments(Item item, List<Comment> comments) {
         return new ItemWithCommentsDTO(item.getId(), item.getName(), item.getDescription(),
                 item.getIsAvailable(), item.getRequestId(), item.getOwnerId(), comments);
+    }
+
+    public static ItemWithBookingDatesAndCommentsDTO createDTOFromItemBookingComments(Item item, Booking booking,
+                                                                                      List<Comment> comments) {
+        Date start = null;
+        Date end = null;
+
+        if (booking != null) {
+            start = booking.getStart();
+            end = booking.getEnd();
+        }
+
+        return new ItemWithBookingDatesAndCommentsDTO(item.getId(), item.getName(), item.getDescription(),
+                item.getIsAvailable(), item.getRequestId(), item.getOwnerId(), start, end, comments);
     }
 }

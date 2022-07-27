@@ -3,7 +3,7 @@ package qwerty268.ShareIt.booking;
 import java.util.List;
 
 public interface BookingService {
-    BookingDTO addBooking(BookingDTO bookingDTO, Long userId);
+    BookingDTO addBooking(ReceivedBookingDTO bookingDTO, Long userId);
 
     BookingDTO update(Long userId, Boolean status, Long bookingId);
 

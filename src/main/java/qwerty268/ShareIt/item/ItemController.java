@@ -2,7 +2,6 @@ package qwerty268.ShareIt.item;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import qwerty268.ShareIt.comment.Comment;
 import qwerty268.ShareIt.comment.CommentDTO;
 
 import java.util.List;
@@ -37,8 +36,8 @@ public class ItemController {
 
     @GetMapping("/items/{itemId}")
     @ResponseBody
-    public ItemWithCommentsDTO getItem(@PathVariable Long itemId) {
-        return service.findById(itemId);
+    public ItemWithBookingsAndCommentsDTO getItem(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long bookerId) {
+        return service.findById(itemId, bookerId);
     }
 
     @DeleteMapping("/items/{itemId}")

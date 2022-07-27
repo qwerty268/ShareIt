@@ -38,10 +38,25 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
 
     @Query(value = "SELECT * FROM Bookings AS b" +
-            " WHERE b.status = 'APPROVED' and b.item_id in (SELECT i.id FROM Items AS i WHERE i.owner_id = ?2)" +
-            " and b.start_date < CURRENT_TIMESTAMP AND b.end_date > CURRENT_TIMESTAMP",
+            " WHERE b.status = 'APPROVED' and b.item_id in (SELECT i.id FROM Items AS i WHERE i.owner_id = ?1)" +
+            " and b.start_date < CURRENT_TIMESTAMP AND b.end_date > CURRENT_TIMESTAMP AND item_id = ?2",
             nativeQuery = true)
-    List<Booking> findApprovedBookingsForOwner(Long ownerId);
+    Booking findApprovedBookingForOwnerByItemId(Long ownerId, Long itemId);
 
     Booking findBookingsByItemIdAndBookerIdAndStatus(Long itemId, Long bookerId, Status status);
+
+    @Query(value = "SELECT * FROM Bookings AS b" +
+            " WHERE b.status = 'APPROVED' and b.item_id in (SELECT i.id FROM Items AS i WHERE i.owner_id = ?1)" +
+            " and b.start_date > CURRENT_TIMESTAMP AND b.end_date > CURRENT_TIMESTAMP AND item_id = ?2" +
+            " ORDER BY b.start_date",
+            nativeQuery = true)
+    List<Booking> findNextBookingForOwner(Long ownerId, Long itemId);
+
+
+    @Query(value = "SELECT * FROM Bookings AS b" +
+            " WHERE b.status = 'APPROVED' and b.item_id in (SELECT i.id FROM Items AS i WHERE i.owner_id = ?1)" +
+            " and b.start_date <= CURRENT_TIMESTAMP AND item_id = ?2" +
+            " ORDER BY b.end_date DESC",
+            nativeQuery = true)
+    List<Booking> findLastBookingForOwner(Long ownerId, Long itemId);
 }

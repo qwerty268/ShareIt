@@ -29,7 +29,8 @@ CREATE TABLE IF NOT EXISTS Bookings
     end_date   TIMESTAMP WITHOUT TIME ZONE,
     item_id    int8 REFERENCES Items (id),
     booker_id  int8 REFERENCES Users (id),
-    status     VARCHAR(15)
+    status     VARCHAR(15),
+    CONSTRAINT START_BEFORE CHECK ( end_date > start_date AND end_date > CURRENT_TIMESTAMP)
 );
 
 CREATE TABLE iF NOT EXISTS Requests

@@ -62,15 +62,15 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemWithBookingDatesAndCommentsDTO> findAll(Long userId) {
-        List<Booking> bookings = bookingRepository
-                .findApprovedBookingsForOwner(userId);
+
+        List<Item> items = itemRepository.findItemsByOwnerId(userId);
 
         List<ItemWithBookingDatesAndCommentsDTO> itemWithBookingDatesDTOS = new ArrayList<>();
 
-        bookings.forEach(booking -> {
-            itemWithBookingDatesDTOS.add(ItemMapper
-                    .createDTOFromItemAndBookingAndComments(itemRepository.findItemById(booking.getItemId()).get(), booking,
-                            commentRepository.findCommentsByItemId(booking.getItemId())));
+        items.forEach(item -> {
+            itemWithBookingDatesDTOS.add(ItemMapper.createDTOFromItemBookingComments(item,
+                    bookingRepository.findApprovedBookingForOwnerByItemId(item.getOwnerId(), item.getId()),
+                    commentRepository.findCommentsByItemId(item.getId())));
         });
 
 
@@ -78,10 +78,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemWithCommentsDTO findById(Long itemId) {
+    public ItemWithBookingsAndCommentsDTO findById(Long itemId, Long bookerId) {
         Item item = itemRepository.findItemById(itemId).orElseThrow(ItemNotFoundException::new);
 
-        return ItemMapper.createDTOFromItemAndComments(item, commentRepository.findCommentsByItemId(itemId));
+        return createDTO(item, bookerId);
     }
 
     @Override
@@ -134,5 +134,34 @@ public class ItemServiceImpl implements ItemService {
         if (!Objects.equals(item.getOwnerId(), userId)) {
             throw new ItemNotFoundException();
         }
+    }
+
+    private ItemWithBookingsAndCommentsDTO createDTO(Item item, Long bookerId) {
+
+        //находим ближайшее следующее
+        Booking futureBooking = null;
+        Booking lastBooking = null;
+
+        if (bookerId == item.getOwnerId()) {
+            Booking booking = bookingRepository.findApprovedBookingForOwnerByItemId(item.getOwnerId(), item.getId());
+            List<Booking> bookings = bookingRepository.findNextBookingForOwner(item.getOwnerId(), item.getId());
+            if (bookings.size() != 0) {
+                lastBooking = bookings.get(0);
+            }
+            if (bookings.size() == 2) {
+                futureBooking = bookings.get(1);
+            }
+
+
+            if (futureBooking == null) {
+                futureBooking = booking;
+            }
+
+            if (lastBooking == null) {
+                lastBooking = booking;
+            }
+        }
+        return ItemMapper.createDTOFromItemBookingsComments(item, lastBooking, futureBooking,
+                commentRepository.findCommentsByItemId(item.getId()));
     }
 }

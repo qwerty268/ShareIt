@@ -1,5 +1,7 @@
 package qwerty268.ShareIt.booking;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import qwerty268.ShareIt.item.Item;
@@ -11,22 +13,17 @@ import javax.persistence.Table;
 import java.util.Date;
 
 @Data
-
+@AllArgsConstructor
 public class BookingDTO {
 
     private Long id;
     private Date start;
     private Date end;
-    private Long itemId;
-    private Long bookerId;
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Item item;
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private User booker;
     private Status status;
 
-    public BookingDTO(Long id, Date start, Date end, Long itemId, Long bookerId, Status status) {
-        this.id = id;
-        this.start = start;
-        this.end = end;
-        this.itemId = itemId;
-        this.bookerId = bookerId;
-        this.status = status;
-    }
+
 }
