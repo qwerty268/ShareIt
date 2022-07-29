@@ -1,5 +1,6 @@
 package qwerty268.ShareIt.booking;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import qwerty268.ShareIt.booking.exceptions.BookingAlreadyPatchedException;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Service
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
@@ -47,11 +49,12 @@ public class BookingServiceImpl implements BookingService {
 
 
         if (item.getIsAvailable() == Boolean.FALSE) {
+            log.error("ItemIsNotAvailable");
             throw new ItemIsNotAvailable();
         }
 
         booking = bookingRepository.save(booking);
-
+        log.info("Бронь сохрана");
         return createBookingDTO(booking);
     }
 
@@ -62,11 +65,13 @@ public class BookingServiceImpl implements BookingService {
         Item item = itemRepository.findById(booking.getItemId()).orElseThrow(InvalidArgsException::new);
 
         if (item.getOwnerId() != ownerId) {
+            log.error("InvalidOwnerOfItemException");
             throw new InvalidOwnerOfItemException();
         }
 
         //Если уже обновляли
         if (booking.getStatus().equals(Status.APPROVED)) {
+            log.error("BookingAlreadyPatchedException");
             throw new BookingAlreadyPatchedException();
         }
 
@@ -77,7 +82,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         bookingRepository.save(booking);
-
+        log.info("Бронь обновлена");
         return createBookingDTO(booking);
     }
 
@@ -87,7 +92,7 @@ public class BookingServiceImpl implements BookingService {
 
         Item item = itemRepository.findById(booking.getItemId()).orElseThrow(InvalidArgsException::new);
         if (item.getOwnerId() == userId || booking.getBookerId() == userId) {
-
+            log.info("Брони пользователя вохвращены");
             return createBookingDTO(booking);
         }
 
@@ -102,23 +107,28 @@ public class BookingServiceImpl implements BookingService {
             case "ALL":
                 bookingRepository.findBookingsByBookerId(userId).forEach(booking ->
                         addBookingDTO(bookingDTOS, booking));
+                log.info("Брони пользователя вохвращены");
                 return bookingDTOS;
             case "FUTURE":
                 bookingRepository.findBookingByStartAfterAndBookerId(Timestamp.from(Instant.now()), userId)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
+                log.info("Брони пользователя вохвращены");
                 return bookingDTOS;
             case "CURRENT":
                 Timestamp timestamp = Timestamp.from(Instant.now());
                 bookingRepository.findBookingsByStartBeforeAndEndAfterAndBookerId(timestamp, timestamp, userId)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
+                log.info("Брони пользователя вохвращены");
                 return bookingDTOS;
             case "PAST":
             case "WAITING":
             case "REJECTED":
                 bookingRepository.findBookingsByStatusEqualsIgnoreCaseAndBookerId(Status.valueOf(state), userId)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
+                log.info("Брони пользователя вохвращены");
                 return bookingDTOS;
             default:
+                log.error("InvalidArgsException");
                 throw new InvalidArgsException();
         }
     }
@@ -134,26 +144,32 @@ public class BookingServiceImpl implements BookingService {
             case "ALL":
                 bookingRepository.findBookingsByItemIdIn(ids)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
+                log.info("Брони для владельца вохвращены");
                 return bookingDTOS;
             case "FUTURE":
                 bookingRepository.findBookingsByItemIdInAndStartAfter(ids, Timestamp.from(Instant.now()))
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
+                log.info("Брони для владельца вохвращены");
                 return bookingDTOS;
             case "CURRENT":
                 Timestamp timestamp = Timestamp.from(Instant.now());
                 bookingRepository.findBookingsByItemIdInAndStartBeforeAndEndAfter(ids, timestamp, timestamp)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
+                log.info("Брони для владельца вохвращены");
                 return bookingDTOS;
             case "PAST":
                 bookingRepository.findBookingsByItemIdInAndEndBefore(ids, Timestamp.from(Instant.now()))
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
+                log.info("Брони для владельца вохвращены");
                 return bookingDTOS;
             case "WAITING":
             case "REJECTED":
                 bookingRepository.findBookingsByStatusAndOwnerId(state, userId)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
+                log.info("Брони для владельца вохвращены");
                 return bookingDTOS;
             default:
+                log.error("InvalidArgsException");
                 throw new InvalidArgsException();
         }
     }
@@ -172,10 +188,12 @@ public class BookingServiceImpl implements BookingService {
         if (booking.getEnd().before(Date.from(Instant.now())) ||
                 booking.getEnd().before(booking.getStart()) ||
                 booking.getStart().before(Date.from(Instant.now()))) {
+            log.error("InvalidArgsException");
             throw new InvalidArgsException();
         }
 
         if (booker.getId() == item.getOwnerId()) {
+            log.error("InvalidOwnerOfItemException");
             throw new InvalidOwnerOfItemException();
         }
     }

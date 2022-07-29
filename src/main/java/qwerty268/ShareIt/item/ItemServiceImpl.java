@@ -1,5 +1,6 @@
 package qwerty268.ShareIt.item;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import qwerty268.ShareIt.booking.Booking;
@@ -21,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
@@ -44,6 +46,7 @@ public class ItemServiceImpl implements ItemService {
         validateItem(item, userId);
 
         item = itemRepository.save(item);
+        log.info("Предмет сохранён");
         return ItemMapper.toDTO(item);
     }
 
@@ -57,6 +60,7 @@ public class ItemServiceImpl implements ItemService {
         validateItem(item, userId);
 
         itemRepository.save(updatedItem);
+        log.info("Предмет обновлён");
         return ItemMapper.toDTO(updatedItem);
     }
 
@@ -71,7 +75,7 @@ public class ItemServiceImpl implements ItemService {
             itemWithBookingDatesDTOS.add(createDTO(item, userId));
         });
 
-
+        log.info("Предметы возвращены");
         return itemWithBookingDatesDTOS;
     }
 
@@ -79,7 +83,9 @@ public class ItemServiceImpl implements ItemService {
     public ItemWithBookingsAndCommentsDTO findById(Long itemId, Long bookerId) {
         Item item = itemRepository.findItemById(itemId).orElseThrow(ItemNotFoundException::new);
 
-        return createDTO(item, bookerId);
+        ItemWithBookingsAndCommentsDTO itemWithBookingsAndCommentsDTO = createDTO(item, bookerId);
+        log.info("Предметы возвращены");
+        return itemWithBookingsAndCommentsDTO;
     }
 
     @Override
@@ -88,7 +94,11 @@ public class ItemServiceImpl implements ItemService {
         if (itemRepository.findItemById(itemId).get().getOwnerId() == userId) {
 
             itemRepository.deleteById(itemId);
-        } else throw new InvalidArgsException();
+            log.info("Предмет удалён");
+        } else {
+            log.error("InvalidArgsException");
+            throw new InvalidArgsException();
+        }
     }
 
     @Override
@@ -101,6 +111,7 @@ public class ItemServiceImpl implements ItemService {
 
         List<ItemDTO> itemDTOS = new ArrayList<>();
         items.forEach(item -> itemDTOS.add(ItemMapper.toDTO(item)));
+        log.info("Предметы возвращены");
 
         return itemDTOS;
     }
@@ -128,7 +139,7 @@ public class ItemServiceImpl implements ItemService {
             throw new InvalidArgsException();
         }
 
-
+        log.info("Комментарий добавлен");
         return CommentMapper.toDTO(comment, userRepository.findById(comment.getAuthorId()).get().getName());
     }
 
@@ -139,9 +150,11 @@ public class ItemServiceImpl implements ItemService {
                 item.getName().isBlank() ||
                 item.getDescription() == null ||
                 item.getIsAvailable() == null) {
+            log.error("InvalidArgsException");
             throw new InvalidArgsException();
         }
         if (!Objects.equals(item.getOwnerId(), userId)) {
+            log.error("ItemNotFoundException");
             throw new ItemNotFoundException();
         }
     }
@@ -149,6 +162,7 @@ public class ItemServiceImpl implements ItemService {
     private void validateComment(Comment comment, Long userId) {
         userRepository.findById(userId).orElseThrow(InvalidArgsException::new);
         if (comment.getText() == null || Objects.equals(comment.getText(), "")) {
+            log.error("InvalidArgsException");
             throw new InvalidArgsException();
         }
     }
