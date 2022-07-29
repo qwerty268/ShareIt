@@ -58,11 +58,6 @@ public class ExceptionController {
         return e.toString();
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleBookingAlreadyPatchedException(final BookingAlreadyPatchedException e) {
-        return e.toString();
-    }
 }
 
 //@ExceptionHandler
