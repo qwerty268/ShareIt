@@ -1,20 +1,26 @@
 package qwerty268.ShareIt.item;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
 import java.util.List;
 import java.util.Optional;
 
-public interface ItemRepository {
 
-    void save(Item item, Long userId);
-    Optional<Item> findById(Long itemId, Long userId);
+public interface ItemRepository extends JpaRepository<Item, Long> {
+    Optional<Item> findItemById(Long itemId);
 
-    void update(Item item, Long userId);
+    List<Item> findItemsByOwnerId(Long ownerId);
 
-    //поиск всех вещей пользователя
-    List<Item> findAllItemsOfUser(Long userId);
+    void deleteById(Long itemId);
 
-    List<Item> findAll();
+    @Query(value = "SELECT * FROM Items AS I" +
+            " WHERE (upper(i.description) LIKE CONCAT('%',upper(?1),'%') OR" +
+            " upper(i.name) LIKE CONCAT('%',upper(?2),'%'))" +
+            " AND i.is_available",
+            nativeQuery = true)
+    List<Item> search(String description, String name);
 
+    List<ItemShort> findAllByOwnerId(Long ownerId);
 
-    void deleteById(Long itemId, Long userId);
 }

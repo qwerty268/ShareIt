@@ -1,18 +1,16 @@
 package qwerty268.ShareIt.user;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
-import java.util.Optional;
+public interface UserRepository extends JpaRepository<User, Long> {
+    @Modifying
+    @Query(value = "update Users set " +
+            "name = ?2, " +
+            "email = ?3 " +
+            "where id = ?1", nativeQuery = true)
+    void updateUser(Long userId, String name, String email);
 
-public interface UserRepository {
-    void save(User user);
 
-    void deleteById(Long userId);
-
-    void update(User user);
-
-    Optional<User> getById(Long userId);
-
-    List<User> getAll();
 }
