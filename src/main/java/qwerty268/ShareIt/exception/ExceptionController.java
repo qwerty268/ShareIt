@@ -1,11 +1,9 @@
 package qwerty268.ShareIt.exception;
 
-import org.postgresql.util.PSQLException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import qwerty268.ShareIt.booking.exceptions.BookingAlreadyPatchedException;
 import qwerty268.ShareIt.booking.exceptions.BookingNotFoundException;
 import qwerty268.ShareIt.item.exceptions.InvalidOwnerOfItemException;
 import qwerty268.ShareIt.item.exceptions.ItemIsNotAvailable;

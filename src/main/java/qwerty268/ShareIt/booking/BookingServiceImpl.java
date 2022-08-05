@@ -2,6 +2,8 @@ package qwerty268.ShareIt.booking;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import qwerty268.ShareIt.booking.exceptions.BookingAlreadyPatchedException;
 import qwerty268.ShareIt.booking.exceptions.BookingNotFoundException;
@@ -101,29 +103,34 @@ public class BookingServiceImpl implements BookingService {
 
 
     @Override
-    public List<BookingDTO> getBookingsOfUser(String state, Long userId) {
+    public List<BookingDTO> getBookingsOfUser(String state, Long userId, int from, int size) {
+        Pageable pageable = PageRequest.of(from, size);
         List<BookingDTO> bookingDTOS = new ArrayList<>();
         switch (state) {
             case "ALL":
-                bookingRepository.findBookingsByBookerId(userId).forEach(booking ->
+                bookingRepository
+                        .findBookingsByBookerId(userId, pageable).forEach(booking ->
                         addBookingDTO(bookingDTOS, booking));
                 log.info("Брони пользователя вохвращены");
                 return bookingDTOS;
             case "FUTURE":
-                bookingRepository.findBookingByStartAfterAndBookerId(Timestamp.from(Instant.now()), userId)
+                bookingRepository
+                        .findBookingByStartAfterAndBookerId(Timestamp.from(Instant.now()), userId, pageable)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
                 log.info("Брони пользователя вохвращены");
                 return bookingDTOS;
             case "CURRENT":
                 Timestamp timestamp = Timestamp.from(Instant.now());
-                bookingRepository.findBookingsByStartBeforeAndEndAfterAndBookerId(timestamp, timestamp, userId)
+                bookingRepository
+                        .findBookingsByStartBeforeAndEndAfterAndBookerId(timestamp, timestamp, userId, pageable)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
                 log.info("Брони пользователя вохвращены");
                 return bookingDTOS;
             case "PAST":
             case "WAITING":
             case "REJECTED":
-                bookingRepository.findBookingsByStatusEqualsIgnoreCaseAndBookerId(Status.valueOf(state), userId)
+                bookingRepository
+                        .findBookingsByStatusEqualsIgnoreCaseAndBookerId(Status.valueOf(state), userId, pageable)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
                 log.info("Брони пользователя вохвращены");
                 return bookingDTOS;
@@ -134,37 +141,37 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDTO> getBookingsForOwner(String state, Long userId) {
-
+    public List<BookingDTO> getBookingsForOwner(String state, Long userId, int from, int size) {
+        Pageable pageable = PageRequest.of(from, size);
         List<Long> ids = new ArrayList<>();
         itemRepository.findAllByOwnerId(userId).forEach(itemShort -> ids.add(itemShort.getId()));
 
         List<BookingDTO> bookingDTOS = new ArrayList<>();
         switch (state) {
             case "ALL":
-                bookingRepository.findBookingsByItemIdIn(ids)
+                bookingRepository.findBookingsByItemIdIn(ids, pageable)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
                 log.info("Брони для владельца вохвращены");
                 return bookingDTOS;
             case "FUTURE":
-                bookingRepository.findBookingsByItemIdInAndStartAfter(ids, Timestamp.from(Instant.now()))
+                bookingRepository.findBookingsByItemIdInAndStartAfter(ids, Timestamp.from(Instant.now()), pageable)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
                 log.info("Брони для владельца вохвращены");
                 return bookingDTOS;
             case "CURRENT":
                 Timestamp timestamp = Timestamp.from(Instant.now());
-                bookingRepository.findBookingsByItemIdInAndStartBeforeAndEndAfter(ids, timestamp, timestamp)
+                bookingRepository.findBookingsByItemIdInAndStartBeforeAndEndAfter(ids, timestamp, timestamp, pageable)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
                 log.info("Брони для владельца вохвращены");
                 return bookingDTOS;
             case "PAST":
-                bookingRepository.findBookingsByItemIdInAndEndBefore(ids, Timestamp.from(Instant.now()))
+                bookingRepository.findBookingsByItemIdInAndEndBefore(ids, Timestamp.from(Instant.now()), pageable)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
                 log.info("Брони для владельца вохвращены");
                 return bookingDTOS;
             case "WAITING":
             case "REJECTED":
-                bookingRepository.findBookingsByStatusAndOwnerId(state, userId)
+                bookingRepository.findBookingsByStatusAndOwnerId(state, userId, pageable)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
                 log.info("Брони для владельца вохвращены");
                 return bookingDTOS;

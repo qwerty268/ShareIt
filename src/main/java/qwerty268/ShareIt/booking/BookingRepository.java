@@ -1,5 +1,6 @@
 package qwerty268.ShareIt.booking;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -10,32 +11,32 @@ import java.util.Optional;
 
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    List<Booking> findBookingsByBookerId(Long bookerId);
+    List<Booking> findBookingsByBookerId(Long bookerId, Pageable pageable);
 
-    List<Booking> findBookingByStartAfterAndBookerId(Timestamp timestamp, Long bookerId);
+    List<Booking> findBookingByStartAfterAndBookerId(Timestamp timestamp, Long bookerId, Pageable pageable);
 
     List<Booking> findBookingsByStartBeforeAndEndAfterAndBookerId(Timestamp timestamp1, Timestamp timestamp2,
-                                                                  Long bookerId);
+                                                                  Long bookerId, Pageable pageable);
 
     @Query(value = "SELECT * FROM Bookings AS b" +
             " WHERE b.status = ?1 and b.booker_id = ?2",
             nativeQuery = true)
-    List<Booking> findBookingsByStatusEqualsIgnoreCaseAndBookerId(Status status, Long bookerId);
+    List<Booking> findBookingsByStatusEqualsIgnoreCaseAndBookerId(Status status, Long bookerId, Pageable pageable);
 
-    List<Booking> findBookingsByItemIdIn(Collection<Long> ids);
+    List<Booking> findBookingsByItemIdIn(Collection<Long> ids, Pageable pageable);
 
-    List<Booking> findBookingsByItemIdInAndStartAfter(Collection<Long> ids, Timestamp timestamp);
+    List<Booking> findBookingsByItemIdInAndStartAfter(Collection<Long> ids, Timestamp timestamp, Pageable pageable);
 
     List<Booking> findBookingsByItemIdInAndStartBeforeAndEndAfter(Collection<Long> ids, Timestamp timestamp1,
-                                                                  Timestamp timestamp2);
+                                                                  Timestamp timestamp2, Pageable pageable);
 
-    List<Booking> findBookingsByItemIdInAndEndBefore(Collection<Long> ids, Timestamp timestamp);
+    List<Booking> findBookingsByItemIdInAndEndBefore(Collection<Long> ids, Timestamp timestamp, Pageable pageable);
 
 
     @Query(value = "SELECT * FROM Bookings AS b" +
             " WHERE b.status = ?1 and b.item_id in (SELECT i.id FROM Items AS i WHERE i.owner_id = ?2)",
             nativeQuery = true)
-    List<Booking> findBookingsByStatusAndOwnerId(String state, Long ownerId);
+    List<Booking> findBookingsByStatusAndOwnerId(String state, Long ownerId, Pageable pageable);
 
 
     @Query(value = "SELECT * FROM Bookings AS b" +

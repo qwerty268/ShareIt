@@ -30,8 +30,10 @@ public class ItemController {
 
     @GetMapping("/items")
     @ResponseBody
-    public List<ItemWithBookingsAndCommentsDTO> findItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        return service.findAll(userId);
+    public List<ItemWithBookingsAndCommentsDTO> findItems(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                          @RequestParam(defaultValue = "0") Integer from,
+                                                          @RequestParam(defaultValue = "5") Integer size) {
+        return service.findAll(userId, from, size);
     }
 
     @GetMapping("/items/{itemId}")
@@ -47,8 +49,10 @@ public class ItemController {
 
     @GetMapping("/items/search")
     @ResponseBody
-    public List<ItemDTO> findItems(@RequestParam String text) {
-        return service.findItemsByParam(text);
+    public List<ItemDTO> findItems(@RequestParam String text,
+                                   @RequestParam(defaultValue = "0") Integer from,
+                                   @RequestParam(defaultValue = "5") Integer size) {
+        return service.findItemsByParam(text, from, size);
     }
 
     @PostMapping("/items/{itemId}/comment")
