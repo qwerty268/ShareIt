@@ -17,7 +17,7 @@ CREATE TABLE iF NOT EXISTS Requests
     id           int8 GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     description  TEXT,
     requestor_id int8 REFERENCES Users (id),
-    creation     TIMESTAMP WITHOUT TIME ZONE
+    created     TIMESTAMP WITHOUT TIME ZONE
 );
 
 CREATE TABLE IF NOT EXISTS Items
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS Items
     name         VARCHAR(40),
     description  TEXT,
     is_available BOOLEAN DEFAULT TRUE,
-    request_id   int8 REFERENCES Requests (id),
+    request_id   int8,
     owner_id     int8 REFERENCES Users (id)
 );
 

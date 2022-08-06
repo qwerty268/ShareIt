@@ -10,6 +10,7 @@ import qwerty268.ShareIt.item.exceptions.ItemIsNotAvailable;
 import qwerty268.ShareIt.item.exceptions.ItemNotFoundException;
 import qwerty268.ShareIt.user.exceptions.UserAlreadyExistException;
 import qwerty268.ShareIt.user.exceptions.UserDoesNotExistException;
+import qwerty268.ShareIt.user.exceptions.UserNotFoundException;
 
 @RestControllerAdvice("qwerty268.ShareIt")
 public class ExceptionController {
@@ -53,6 +54,12 @@ public class ExceptionController {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleBookingNotFoundException(final BookingNotFoundException e) {
+        return e.toString();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleUserNotFoundException(final UserNotFoundException e) {
         return e.toString();
     }
 

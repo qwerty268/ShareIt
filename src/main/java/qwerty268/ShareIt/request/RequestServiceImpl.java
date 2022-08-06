@@ -9,11 +9,13 @@ import qwerty268.ShareIt.exception.InvalidArgsException;
 import qwerty268.ShareIt.item.ItemRepository;
 import qwerty268.ShareIt.request.exceptions.RequestNotFoundException;
 import qwerty268.ShareIt.user.UserRepository;
+import qwerty268.ShareIt.user.exceptions.UserNotFoundException;
 
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class RequestServiceImpl implements RequestService {
@@ -37,7 +39,7 @@ public class RequestServiceImpl implements RequestService {
 
         Request request = RequestMapper.fromDTO(requestDTO);
         request = requestRepository.save(request);
-        request.setCreation(Timestamp.from(Instant.now()));
+        request.setCreated(Timestamp.from(Instant.now()));
 
         return RequestMapper.toDTO(request);
     }
@@ -75,11 +77,11 @@ public class RequestServiceImpl implements RequestService {
     }
 
     private void checkUser(Long userId) {
-        userRepository.findById(userId).orElseThrow(InvalidArgsException::new);
+        userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }
 
     private void validateRequest(RequestDTO requestDTO) {
-        if (requestDTO.getDescription() == null) {
+        if (requestDTO.getDescription() == null || Objects.equals(requestDTO.getDescription(), "")) {
             throw new InvalidArgsException();
         }
     }

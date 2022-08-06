@@ -17,7 +17,7 @@ public class Request {
     private String description;
     @Column(name = "requestor_id")
     private Long requestorId;
-    private Timestamp creation;
+    private Timestamp created;
 
     public Request(Long id, String description, Long requestorId) {
         this.id = id;

@@ -10,14 +10,14 @@ import java.util.List;
 
 public class ItemMapper {
     public static ItemDTO toDTO(Item item) {
-        return new ItemDTO(item.getId(), item.getName(), item.getDescription(), item.getIsAvailable(), item.getOwnerId(),
-                item.getRequestId());
+        return new ItemDTO(item.getId(), item.getName(), item.getDescription(), item.getIsAvailable(),
+                item.getRequestId(), item.getOwnerId());
     }
 
     public static Item fromDTO(ItemDTO itemDTO, final Long ownerId) {
 
-        return new Item(itemDTO.getId(), itemDTO.getName(), itemDTO.getDescription(), itemDTO.getIsAvailable(), ownerId,
-                itemDTO.getRequestId());
+        return new Item(itemDTO.getId(), itemDTO.getName(), itemDTO.getDescription(), itemDTO.getIsAvailable(),
+                itemDTO.getRequestId(), ownerId);
     }
 
     public static Item update(Item notUpdatedItem, Item updatedItem) {
