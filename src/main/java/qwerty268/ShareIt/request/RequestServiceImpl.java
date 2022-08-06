@@ -6,6 +6,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 import qwerty268.ShareIt.exception.InvalidArgsException;
+import qwerty268.ShareIt.item.ItemDTO;
+import qwerty268.ShareIt.item.ItemMapper;
 import qwerty268.ShareIt.item.ItemRepository;
 import qwerty268.ShareIt.request.exceptions.RequestNotFoundException;
 import qwerty268.ShareIt.user.UserRepository;
@@ -49,8 +51,13 @@ public class RequestServiceImpl implements RequestService {
         checkUser(requestorId);
 
         List<RequestDTO> requestDTOS = new ArrayList<>();
-        requestRepository.findRequestsByRequestorId(requestorId).forEach(request ->
-                requestDTOS.add(RequestMapper.toDTO(request)));
+
+        requestRepository.findRequestsByRequestorId(requestorId).forEach(request -> {
+            RequestDTO requestDTO = createDTOWithItems(request);
+
+            requestDTOS.add(requestDTO);
+        });
+
 
         return requestDTOS;
     }
@@ -63,17 +70,19 @@ public class RequestServiceImpl implements RequestService {
 
         Pageable pageable = PageRequest.of(from, size, Sort.by("created").descending());
 
-        requestRepository.findRequestsByRequestorIdNot(userId, pageable).forEach(request ->
-                requestDTOS.add(RequestMapper.toDTO(request)));
+
+        requestRepository.findRequestsByRequestorIdNot(userId, pageable).forEach(request -> {
+            RequestDTO requestDTO = createDTOWithItems(request);
+            requestDTOS.add(requestDTO);
+        });
+
         return requestDTOS;
     }
 
     @Override
     public RequestDTO getRequestById(Long requestId) {
         Request request = requestRepository.findById(requestId).orElseThrow(RequestNotFoundException::new);
-        RequestDTO requestDTO = RequestMapper.toDTO(request);
-        requestDTO.setResponses(itemRepository.findItemsByRequestId(requestId));
-        return requestDTO;
+        return createDTOWithItems(request);
     }
 
     private void checkUser(Long userId) {
@@ -84,5 +93,16 @@ public class RequestServiceImpl implements RequestService {
         if (requestDTO.getDescription() == null || Objects.equals(requestDTO.getDescription(), "")) {
             throw new InvalidArgsException();
         }
+    }
+
+    //добавление списка предметов реквесту
+    private RequestDTO createDTOWithItems(Request request) {
+        RequestDTO requestDTO = RequestMapper.toDTO(request);
+
+        List<ItemDTO> itemDTOS = requestDTO.getItems();
+        itemRepository.findItemsByRequestId(requestDTO.getId()).forEach(item -> //добавление списка предметов каждому реквесту
+                itemDTOS.add(ItemMapper.toDTO(item)));
+
+        return requestDTO;
     }
 }
