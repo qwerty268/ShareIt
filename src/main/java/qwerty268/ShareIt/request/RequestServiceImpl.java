@@ -38,8 +38,8 @@ public class RequestServiceImpl implements RequestService {
         requestDTO.setRequestorId(requestorId);
 
         Request request = RequestMapper.fromDTO(requestDTO);
-        request = requestRepository.save(request);
         request.setCreated(Timestamp.from(Instant.now()));
+        request = requestRepository.save(request);
 
         return RequestMapper.toDTO(request);
     }
@@ -61,7 +61,7 @@ public class RequestServiceImpl implements RequestService {
 
         List<RequestDTO> requestDTOS = new ArrayList<>();
 
-        Pageable pageable = PageRequest.of(from, size, Sort.by("creation").descending());
+        Pageable pageable = PageRequest.of(from, size, Sort.by("created").descending());
 
         requestRepository.findRequestsByRequestorIdNot(userId, pageable).forEach(request ->
                 requestDTOS.add(RequestMapper.toDTO(request)));

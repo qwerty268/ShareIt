@@ -27,8 +27,8 @@ public class RequestController {
 
     @GetMapping("/requests/all")
     public List<RequestDTO> getAvailableRequests(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                 @RequestParam(defaultValue = "0") Integer from,
-                                                 @RequestParam(defaultValue = "5") Integer size) {
+                                                 @RequestParam(defaultValue = "0", required = false) Integer from,
+                                                 @RequestParam(defaultValue = "5", required = false) Integer size) {
         return requestService.getAvailableRequests(userId, from, size);
     }
 

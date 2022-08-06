@@ -20,6 +20,7 @@ import qwerty268.ShareIt.user.UserRepository;
 import qwerty268.ShareIt.user.exceptions.UserNotFoundException;
 
 import javax.transaction.Transactional;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -141,7 +142,7 @@ public class ItemServiceImpl implements ItemService {
         }
         Booking booking = bookings.get(0);
 
-
+        Timestamp timestamp = Timestamp.from(Instant.now());
         if (booking.getStart().toInstant().isBefore(Instant.now())) {
             comment = commentRepository.save(comment);
         } else {
@@ -173,9 +174,10 @@ public class ItemServiceImpl implements ItemService {
 
     private void validateComment(Comment comment, Long userId) {
         userRepository.findById(userId).orElseThrow(InvalidArgsException::new);
+
         if (comment.getText() == null || Objects.equals(comment.getText(), "")) {
             log.error("InvalidArgsException");
-            throw new ItemNotFoundException();
+            throw new InvalidArgsException();
         }
     }
 

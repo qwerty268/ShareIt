@@ -24,15 +24,16 @@ public class ItemController {
 
     @PatchMapping("/items/{id}")
     @ResponseBody
-    public ItemDTO updateItem(@PathVariable Long id, @RequestBody ItemDTO itemDTO, @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ItemDTO updateItem(@PathVariable Long id, @RequestBody ItemDTO itemDTO,
+                              @RequestHeader("X-Sharer-User-Id") Long userId) {
         return service.update(itemDTO, userId, id);
     }
 
     @GetMapping("/items")
     @ResponseBody
     public List<ItemWithBookingsAndCommentsDTO> findItems(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                          @RequestParam(defaultValue = "0") Integer from,
-                                                          @RequestParam(defaultValue = "5") Integer size) {
+                                                          @RequestParam(defaultValue = "0", required = false) Integer from,
+                                                          @RequestParam(defaultValue = "5", required = false) Integer size) {
         return service.findAll(userId, from, size);
     }
 
@@ -50,8 +51,8 @@ public class ItemController {
     @GetMapping("/items/search")
     @ResponseBody
     public List<ItemDTO> findItems(@RequestParam String text,
-                                   @RequestParam(defaultValue = "0") Integer from,
-                                   @RequestParam(defaultValue = "5") Integer size) {
+                                   @RequestParam(defaultValue = "0", required = false) Integer from,
+                                   @RequestParam(defaultValue = "5", required = false) Integer size) {
         return service.findItemsByParam(text, from, size);
     }
 
