@@ -9,6 +9,7 @@ import qwerty268.ShareIt.booking.exceptions.BookingNotFoundException;
 import qwerty268.ShareIt.item.exceptions.InvalidOwnerOfItemException;
 import qwerty268.ShareIt.item.exceptions.ItemIsNotAvailable;
 import qwerty268.ShareIt.item.exceptions.ItemNotFoundException;
+import qwerty268.ShareIt.request.exceptions.RequestNotFoundException;
 import qwerty268.ShareIt.user.exceptions.UserAlreadyExistException;
 import qwerty268.ShareIt.user.exceptions.UserDoesNotExistException;
 import qwerty268.ShareIt.user.exceptions.UserNotFoundException;
@@ -76,6 +77,12 @@ public class ExceptionController {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handeBookingAlreadyPatchedException(final BookingAlreadyPatchedException e) {
+        return e.toString();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handeRequestNotFoundException(final RequestNotFoundException e) {
         return e.toString();
     }
 }

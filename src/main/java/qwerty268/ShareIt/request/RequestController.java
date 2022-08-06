@@ -33,7 +33,7 @@ public class RequestController {
     }
 
     @GetMapping("/requests/{requestId}")
-    public RequestDTO getRequestById(@PathVariable Long requestId) {
-        return null;
+    public RequestDTO getRequestById(@PathVariable Long requestId, @RequestHeader("X-Sharer-User-Id") Long userId) {
+        return requestService.getRequestById(requestId, userId);
     }
 }

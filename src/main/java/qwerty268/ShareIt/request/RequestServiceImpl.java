@@ -80,7 +80,8 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public RequestDTO getRequestById(Long requestId) {
+    public RequestDTO getRequestById(Long requestId, Long userId) {
+        checkUser(userId);
         Request request = requestRepository.findById(requestId).orElseThrow(RequestNotFoundException::new);
         return createDTOWithItems(request);
     }

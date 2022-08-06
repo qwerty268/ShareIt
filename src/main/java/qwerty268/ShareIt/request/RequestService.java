@@ -9,5 +9,5 @@ public interface RequestService {
 
     List<RequestDTO> getAvailableRequests(Long userId, int from, int size);
 
-    RequestDTO getRequestById(Long requestId);
+    RequestDTO getRequestById(Long requestId, Long userId);
 }
