@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Data
@@ -15,9 +16,9 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "start_date")
-    private Date start;
+    private Timestamp start;
     @Column(name = "end_date")
-    private Date end;
+    private Timestamp end;
     @Column(name = "item_id")
     private Long itemId;
     @Column(name = "booker_id")
@@ -26,7 +27,7 @@ public class Booking {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    public Booking(Long id, Date start, Date end, Long itemId, Long bookerId, Status status) {
+    public Booking(Long id, Timestamp start, Timestamp end, Long itemId, Long bookerId, Status status) {
         this.id = id;
         this.start = start;
         this.end = end;
@@ -35,7 +36,7 @@ public class Booking {
         this.status = status;
     }
 
-    public Booking(Long id, Date start, Date end) {
+    public Booking(Long id, Timestamp start, Timestamp end) {
         this.itemId = id;
         this.start = start;
         this.end = end;

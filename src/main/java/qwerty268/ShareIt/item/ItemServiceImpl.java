@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import qwerty268.ShareIt.booking.Booking;
 import qwerty268.ShareIt.booking.BookingRepository;
@@ -73,7 +74,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemWithBookingsAndCommentsDTO> findAll(Long userId, int from, int size) {
-        Pageable pageable = PageRequest.of(from, size);
+        Pageable pageable = PageRequest.of(from, size, Sort.by("id"));
 
         List<Item> items = itemRepository.findItemsByOwnerId(userId, pageable);
 

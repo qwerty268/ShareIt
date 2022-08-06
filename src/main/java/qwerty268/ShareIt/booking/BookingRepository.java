@@ -1,5 +1,6 @@
 package qwerty268.ShareIt.booking;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -7,21 +8,24 @@ import org.springframework.data.jpa.repository.Query;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Stream;
 
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findBookingsByBookerId(Long bookerId, Pageable pageable);
+
 
     List<Booking> findBookingByStartAfterAndBookerId(Timestamp timestamp, Long bookerId, Pageable pageable);
 
     List<Booking> findBookingsByStartBeforeAndEndAfterAndBookerId(Timestamp timestamp1, Timestamp timestamp2,
                                                                   Long bookerId, Pageable pageable);
 
+    List<Booking> findBookingByEndBeforeAndBookerId(Timestamp timestamp, Long bookerId, Pageable pageable);
+
     @Query(value = "SELECT * FROM Bookings AS b" +
             " WHERE b.status = ?1 and b.booker_id = ?2",
             nativeQuery = true)
-    List<Booking> findBookingsByStatusEqualsIgnoreCaseAndBookerId(Status status, Long bookerId, Pageable pageable);
+    List<Booking> findBookingsByStatusEqualsIgnoreCaseAndBookerId(String status, Long bookerId, Pageable pageable);
 
     List<Booking> findBookingsByItemIdIn(Collection<Long> ids, Pageable pageable);
 

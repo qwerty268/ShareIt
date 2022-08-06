@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import qwerty268.ShareIt.booking.exceptions.BookingAlreadyPatchedException;
 import qwerty268.ShareIt.booking.exceptions.BookingNotFoundException;
@@ -16,10 +17,13 @@ import qwerty268.ShareIt.item.exceptions.ItemNotFoundException;
 import qwerty268.ShareIt.user.User;
 import qwerty268.ShareIt.user.UserRepository;
 import qwerty268.ShareIt.user.exceptions.UserDoesNotExistException;
+import qwerty268.ShareIt.user.exceptions.UserNotFoundException;
 
 import javax.transaction.Transactional;
 import java.sql.Timestamp;
+import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -104,45 +108,57 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDTO> getBookingsOfUser(String state, Long userId, int from, int size) {
-        Pageable pageable = PageRequest.of(from, size);
+        validateUser(userId);
+
+        Timestamp currentTimestamp = getCurrentTimestamp();
+        Pageable pageable = PageRequest.of(from, size, Sort.by("id").descending());
+
         List<BookingDTO> bookingDTOS = new ArrayList<>();
         switch (state) {
             case "ALL":
                 bookingRepository
                         .findBookingsByBookerId(userId, pageable).forEach(booking ->
-                        addBookingDTO(bookingDTOS, booking));
+                                addBookingDTO(bookingDTOS, booking));
                 log.info("Брони пользователя вохвращены");
                 return bookingDTOS;
             case "FUTURE":
                 bookingRepository
-                        .findBookingByStartAfterAndBookerId(Timestamp.from(Instant.now()), userId, pageable)
+                        .findBookingByStartAfterAndBookerId(currentTimestamp, userId, pageable)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
                 log.info("Брони пользователя вохвращены");
                 return bookingDTOS;
             case "CURRENT":
-                Timestamp timestamp = Timestamp.from(Instant.now());
                 bookingRepository
-                        .findBookingsByStartBeforeAndEndAfterAndBookerId(timestamp, timestamp, userId, pageable)
+                        .findBookingsByStartBeforeAndEndAfterAndBookerId(currentTimestamp, currentTimestamp, userId,
+                                pageable)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
                 log.info("Брони пользователя вохвращены");
                 return bookingDTOS;
             case "PAST":
+                bookingRepository.findBookingByEndBeforeAndBookerId(currentTimestamp, userId, pageable)
+                        .forEach(booking -> addBookingDTO(bookingDTOS, booking));
+                log.info("Брони пользователя вохвращены");
+                return bookingDTOS;
             case "WAITING":
             case "REJECTED":
                 bookingRepository
-                        .findBookingsByStatusEqualsIgnoreCaseAndBookerId(Status.valueOf(state), userId, pageable)
+                        .findBookingsByStatusEqualsIgnoreCaseAndBookerId(state, userId, pageable)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
                 log.info("Брони пользователя вохвращены");
                 return bookingDTOS;
             default:
-                log.error("InvalidArgsException");
-                throw new InvalidArgsException();
+                log.error("IllegalStateException");
+                throw new IllegalStateException("Unknown state: UNSUPPORTED_STATUS");
         }
     }
 
     @Override
     public List<BookingDTO> getBookingsForOwner(String state, Long userId, int from, int size) {
-        Pageable pageable = PageRequest.of(from, size);
+        validateUser(userId);
+
+        Timestamp currentTimestamp = getCurrentTimestamp();
+        Pageable pageable = PageRequest.of(from, size, Sort.by("id").descending());
+
         List<Long> ids = new ArrayList<>();
         itemRepository.findAllByOwnerId(userId).forEach(itemShort -> ids.add(itemShort.getId()));
 
@@ -154,18 +170,18 @@ public class BookingServiceImpl implements BookingService {
                 log.info("Брони для владельца вохвращены");
                 return bookingDTOS;
             case "FUTURE":
-                bookingRepository.findBookingsByItemIdInAndStartAfter(ids, Timestamp.from(Instant.now()), pageable)
+                bookingRepository.findBookingsByItemIdInAndStartAfter(ids, currentTimestamp, pageable)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
                 log.info("Брони для владельца вохвращены");
                 return bookingDTOS;
             case "CURRENT":
-                Timestamp timestamp = Timestamp.from(Instant.now());
-                bookingRepository.findBookingsByItemIdInAndStartBeforeAndEndAfter(ids, timestamp, timestamp, pageable)
+                bookingRepository.findBookingsByItemIdInAndStartBeforeAndEndAfter(ids, currentTimestamp,
+                                currentTimestamp, pageable)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
                 log.info("Брони для владельца вохвращены");
                 return bookingDTOS;
             case "PAST":
-                bookingRepository.findBookingsByItemIdInAndEndBefore(ids, Timestamp.from(Instant.now()), pageable)
+                bookingRepository.findBookingsByItemIdInAndEndBefore(ids, currentTimestamp, pageable)
                         .forEach(booking -> addBookingDTO(bookingDTOS, booking));
                 log.info("Брони для владельца вохвращены");
                 return bookingDTOS;
@@ -176,8 +192,8 @@ public class BookingServiceImpl implements BookingService {
                 log.info("Брони для владельца вохвращены");
                 return bookingDTOS;
             default:
-                log.error("InvalidArgsException");
-                throw new InvalidArgsException();
+                log.error("IllegalStateException");
+                throw new IllegalStateException("Unknown state: UNSUPPORTED_STATUS");
         }
     }
 
@@ -203,5 +219,13 @@ public class BookingServiceImpl implements BookingService {
             log.error("InvalidOwnerOfItemException");
             throw new InvalidOwnerOfItemException();
         }
+    }
+
+    private void validateUser(Long userId) {
+        userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    }
+
+    private Timestamp getCurrentTimestamp() {
+        return Timestamp.from(Instant.now(Clock.system(ZoneId.of("Europe/Moscow"))));
     }
 }
