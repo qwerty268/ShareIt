@@ -8,9 +8,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import qwerty268.ShareIt.exception.InvalidArgsException;
 
+import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,12 +39,10 @@ class UserServiceImplTest {
 
     @Test
     void addUserWithFailEmail() {
-        User newUser = new User(1L, "John", "notValid.com")   ;
+        User newUser = new User(1L, "John", "notValid.com");
 
 
-        assertThrows(InvalidArgsException.class, () -> {
-            userService.add(UserMapper.toDTO(newUser));
-        });
+        assertThrows(InvalidArgsException.class, () -> userService.add(UserMapper.toDTO(newUser)));
     }
 
     @Test
@@ -61,13 +59,17 @@ class UserServiceImplTest {
 
     @Test
     void getAll() {
+        Mockito.when(userRepository.findAll()).thenReturn(List.of(user));
+        List<UserDTO> userDTOS = userService.getAll();
+
+        assertEquals(userDTOS.size(),1);
+        assertEquals(userDTOS, List.of(UserMapper.toDTO(user)));
     }
 
     @Test
     void getById() {
-    }
+        Mockito.when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
-    @Test
-    void deleteById() {
+        assertEquals(userService.getById(user.getId()), UserMapper.toDTO(user));
     }
 }
