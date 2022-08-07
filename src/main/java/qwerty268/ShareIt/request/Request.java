@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 
 @Data
 @Table(name = "Requests")
@@ -17,7 +18,7 @@ public class Request {
     private String description;
     @Column(name = "requestor_id")
     private Long requestorId;
-    private Timestamp created;
+    private Date created;
 
     public Request(Long id, String description, Long requestorId) {
         this.id = id;

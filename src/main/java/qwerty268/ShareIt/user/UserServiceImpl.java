@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import qwerty268.ShareIt.exception.InvalidArgsException;
 import qwerty268.ShareIt.user.exceptions.UserDoesNotExistException;
+import qwerty268.ShareIt.user.exceptions.UserNotFoundException;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO update(UserDTO userDTO, Long userId) {
         User user = UserMapper.fromDTO(userDTO);
 
-        User notUpdatedUser = repository.getById(userId);
+        User notUpdatedUser = repository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         UserMapper.updateUser(notUpdatedUser, user);
 

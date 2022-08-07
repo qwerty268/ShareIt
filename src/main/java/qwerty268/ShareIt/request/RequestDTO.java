@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -20,10 +21,10 @@ public class RequestDTO {
     private Long id;
     private String description;
     private Long requestorId;
-    private Timestamp created;
+    private Date created;
     private List<ItemDTO> items = new ArrayList<>();
 
-    public RequestDTO(Long id, String description, Long requestorId, Timestamp created) {
+    public RequestDTO(Long id, String description, Long requestorId, Date created) {
         this.id = id;
         this.description = description;
         this.requestorId = requestorId;

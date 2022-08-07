@@ -13,6 +13,7 @@ import qwerty268.ShareIt.request.exceptions.RequestNotFoundException;
 import qwerty268.ShareIt.user.UserRepository;
 import qwerty268.ShareIt.user.exceptions.UserNotFoundException;
 
+import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public RequestDTO addRequest(RequestDTO requestDTO, Long requestorId) {
         checkUser(requestorId);
         validateRequest(requestDTO);

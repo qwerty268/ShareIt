@@ -141,9 +141,9 @@ public class ItemServiceImpl implements ItemService {
             throw new InvalidArgsException();
         }
         Booking booking = bookings.get(0);
+        Date date = Date.from(Instant.now());
 
-        Timestamp timestamp = Timestamp.from(Instant.now());
-        if (booking.getStart().toInstant().isBefore(Instant.now())) {
+        if (booking.getStart().before(Date.from(Instant.now()))) {
             comment = commentRepository.save(comment);
         } else {
             throw new InvalidArgsException();
