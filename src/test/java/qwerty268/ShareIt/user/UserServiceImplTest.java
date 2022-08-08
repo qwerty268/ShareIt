@@ -54,7 +54,6 @@ class UserServiceImplTest {
         Mockito.when(userRepository.save(any())).thenReturn(UserMapper.fromDTO(newUser));
 
         assertEquals(userService.update(newUser, newUser.getId()), newUser);
-
     }
 
     @Test
@@ -62,7 +61,7 @@ class UserServiceImplTest {
         Mockito.when(userRepository.findAll()).thenReturn(List.of(user));
         List<UserDTO> userDTOS = userService.getAll();
 
-        assertEquals(userDTOS.size(),1);
+        assertEquals(userDTOS.size(), 1);
         assertEquals(userDTOS, List.of(UserMapper.toDTO(user)));
     }
 
