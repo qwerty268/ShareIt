@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 
-@ContextConfiguration(classes = {UserServiceImpl.class})
+@ContextConfiguration(classes = UserServiceImpl.class)
 @SpringJUnitConfig
 class UserServiceImplTest {
 
@@ -30,7 +30,6 @@ class UserServiceImplTest {
             "John",
             "john.doe@mail.com");
 
-
     @Test
     void add() {
         Mockito.when(userRepository.save(any())).thenReturn(user);
@@ -40,7 +39,6 @@ class UserServiceImplTest {
     @Test
     void addUserWithFailEmail() {
         User newUser = new User(1L, "John", "notValid.com");
-
 
         assertThrows(InvalidArgsException.class, () -> userService.add(UserMapper.toDTO(newUser)));
     }

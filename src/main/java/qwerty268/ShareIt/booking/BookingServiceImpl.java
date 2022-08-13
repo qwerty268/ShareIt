@@ -50,7 +50,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setStatus(Status.WAITING);
 
         User booker = userRepository.findById(bookerId).orElseThrow(UserDoesNotExistException::new);
-        Item item = itemRepository.findItemById(booking.getItemId()).orElseThrow(ItemNotFoundException::new);
+        Item item = itemRepository.findById(booking.getItemId()).orElseThrow(ItemNotFoundException::new);
         validate(booking, booker, item);
 
 
@@ -204,7 +204,7 @@ public class BookingServiceImpl implements BookingService {
     private BookingDTO createBookingDTO(Booking booking) {
         return BookingMapper
                 .toDTO(booking, userRepository.findById(booking.getBookerId()).orElseThrow(InvalidArgsException::new),
-                        itemRepository.findItemById(booking.getItemId()).orElseThrow(InvalidArgsException::new));
+                        itemRepository.findById(booking.getItemId()).orElseThrow(InvalidArgsException::new));
     }
 
     private void validate(Booking booking, User booker, Item item) {
@@ -215,7 +215,7 @@ public class BookingServiceImpl implements BookingService {
             throw new InvalidArgsException();
         }
 
-        if (booker.getId() == item.getOwnerId()) {
+        if (booker.getId() != item.getOwnerId()) {
             log.error("InvalidOwnerOfItemException");
             throw new InvalidOwnerOfItemException();
         }

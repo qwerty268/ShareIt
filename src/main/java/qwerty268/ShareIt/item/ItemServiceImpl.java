@@ -20,7 +20,6 @@ import qwerty268.ShareIt.user.UserRepository;
 import qwerty268.ShareIt.user.exceptions.UserNotFoundException;
 
 import javax.transaction.Transactional;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -91,7 +90,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemWithBookingsAndCommentsDTO findById(Long itemId, Long bookerId) {
-        Item item = itemRepository.findItemById(itemId).orElseThrow(ItemNotFoundException::new);
+        Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
 
         ItemWithBookingsAndCommentsDTO itemWithBookingsAndCommentsDTO = createDTO(item, bookerId);
         log.info("Предметы возвращены");
@@ -101,7 +100,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public void deleteById(Long itemId, Long userId) {
-        if (Objects.equals(itemRepository.findItemById(itemId).get().getOwnerId(), userId)) {
+        if (Objects.equals(itemRepository.findById(itemId).get().getOwnerId(), userId)) {
 
             itemRepository.deleteById(itemId);
             log.info("Предмет удалён");
@@ -130,7 +129,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public CommentDTO addComment(CommentDTO commentDTO, Long userId, Long itemId) {
         Comment comment = CommentMapper.fromDTO(commentDTO);
+        comment.setAuthorId(userId);
         comment.setItemId(itemId);
+        comment.setCreated(Date.from(Instant.now()));
 
         validateComment(comment, userId);
 
@@ -141,10 +142,9 @@ public class ItemServiceImpl implements ItemService {
             throw new InvalidArgsException();
         }
         Booking booking = bookings.get(0);
-        Date date = Date.from(Instant.now());
 
         if (booking.getStart().before(Date.from(Instant.now()))) {
-            comment = commentRepository.save(comment);
+            commentRepository.save(comment);
         } else {
             throw new InvalidArgsException();
         }
