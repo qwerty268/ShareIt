@@ -71,8 +71,8 @@ class BookingControllerTest {
                 .characterEncoding(StandardCharsets.UTF_8)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect()
+                .andExpect(status().isOk());
+
 
 
     }

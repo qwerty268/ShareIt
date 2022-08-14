@@ -7,16 +7,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import qwerty268.ShareIt.booking.BookingServiceImpl;
+import qwerty268.ShareIt.exception.InvalidArgsException;
 import qwerty268.ShareIt.item.ItemRepository;
 import qwerty268.ShareIt.user.User;
 import qwerty268.ShareIt.user.UserRepository;
+import qwerty268.ShareIt.user.exceptions.UserNotFoundException;
 
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 
 @ContextConfiguration(classes = RequestServiceImpl.class)
@@ -25,7 +27,6 @@ class RequestServiceImplTest {
     @Autowired
     RequestService requestService;
 
-
     @MockBean
     RequestRepository requestRepository;
     @MockBean
@@ -33,8 +34,8 @@ class RequestServiceImplTest {
     @MockBean
     ItemRepository itemRepository;
 
-    RequestDTO requestDTO = new RequestDTO(1L, "Как же я хочу дрель", 1L, null);
-    User user = new User(1L, "Иван Дрель", "aaaaaaa@mial.ru");
+    RequestDTO requestDTO = new RequestDTO(1L, "Ка же я хочу дрель", 1L, null);
+    User user = new User(1L, "Иван Дрель", "aaaaaaaк@mial.ru");
     Instant instant = Instant.now();
 
     @BeforeEach
@@ -52,4 +53,17 @@ class RequestServiceImplTest {
         assertEquals(DTOToAdd, test);
     }
 
+    @Test
+    void addRequestWithWrongUser() {
+        Mockito.when(userRepository.findById(requestDTO.getRequestorId())).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class,
+                () -> requestService.addRequest(requestDTO, requestDTO.getRequestorId()));
+    }
+
+    @Test
+    void addRequestWithInvalidArgs() {
+        RequestDTO wrongRequest = new RequestDTO(1L, "", 1L, null);
+        assertThrows(InvalidArgsException.class,
+                () -> requestService.addRequest(wrongRequest, requestDTO.getRequestorId()));
+    }
 }
