@@ -47,6 +47,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDTO save(ItemDTO itemDTO, Long userId) {
         Item item = ItemMapper.fromDTO(itemDTO, userId);
         item.setOwnerId(userId);
+
         validateOwnerOfItem(item, userId);
         validateItem(item);
 
@@ -58,7 +59,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemDTO update(ItemDTO itemDTO, Long userId, Long itemId) {
-        Item notUpdatedItem = itemRepository.findById(itemId).orElseThrow(InvalidOwnerOfItemException::new);
+        Item notUpdatedItem = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
+
+
 
         validateOwnerOfItem(notUpdatedItem, userId);
         validateItem(notUpdatedItem);
@@ -157,6 +160,7 @@ public class ItemServiceImpl implements ItemService {
         if (item.getName() == null ||
                 item.getName().isBlank() ||
                 item.getDescription() == null ||
+                item.getDescription().isBlank() ||
                 item.getIsAvailable() == null) {
             log.error("InvalidArgsException");
             throw new InvalidArgsException();
@@ -164,16 +168,16 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void validateOwnerOfItem(Item item, Long ownerId) {
-        userRepository.findById(ownerId).orElseThrow(InvalidOwnerOfItemException::new);
+        userRepository.findById(ownerId).orElseThrow(UserNotFoundException::new);
 
         if (!Objects.equals(item.getOwnerId(), ownerId)) {
             log.error("ItemNotFoundException");
-            throw new UserNotFoundException();
+            throw new InvalidOwnerOfItemException();
         }
     }
 
     private void validateComment(Comment comment, Long userId) {
-        userRepository.findById(userId).orElseThrow(InvalidArgsException::new);
+        userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         if (comment.getText() == null || Objects.equals(comment.getText(), "")) {
             log.error("InvalidArgsException");
@@ -187,7 +191,7 @@ public class ItemServiceImpl implements ItemService {
         Booking futureBooking = null;
         Booking lastBooking = null;
 
-        if (bookerId == item.getOwnerId()) {
+        if (Objects.equals(bookerId, item.getOwnerId())) {
             Booking booking = bookingRepository.findApprovedBookingForOwnerByItemId(item.getOwnerId(), item.getId());
             List<Booking> bookings = bookingRepository.findNextBookingForOwner(item.getOwnerId(), item.getId());
             if (bookings.size() != 0) {

@@ -11,10 +11,14 @@ import qwerty268.ShareIt.booking.BookingRepository;
 import qwerty268.ShareIt.booking.Status;
 import qwerty268.ShareIt.comment.CommentDTO;
 import qwerty268.ShareIt.comment.CommentRepository;
+import qwerty268.ShareIt.exception.InvalidArgsException;
+import qwerty268.ShareIt.item.exceptions.InvalidOwnerOfItemException;
+import qwerty268.ShareIt.item.exceptions.ItemNotFoundException;
 import qwerty268.ShareIt.user.User;
 import qwerty268.ShareIt.user.UserDTO;
 import qwerty268.ShareIt.user.UserMapper;
 import qwerty268.ShareIt.user.UserRepository;
+import qwerty268.ShareIt.user.exceptions.UserNotFoundException;
 
 import javax.swing.text.html.parser.Entity;
 
@@ -47,7 +51,7 @@ class ItemServiceImplTest {
     LocalDate localDateEnd = LocalDate.of(2022, 6, 20);
     Date date = Date.from(localDateEnd.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-    CommentDTO commentDTO = new CommentDTO(null, "comment",null, null, null, null);
+    CommentDTO commentDTO = new CommentDTO(null, "comment", null, null, null, null);
     Booking booking = new Booking(1L, date,
             date, 1L, 1L, Status.APPROVED);
 
@@ -68,6 +72,22 @@ class ItemServiceImplTest {
     }
 
     @Test
+    void saveWithUnknownOwner() {
+        Mockito.when(userRepository.findById(any())).thenReturn(Optional.empty());
+
+        ItemDTO itemDTO = ItemMapper.toDTO(item);
+        assertThrows(UserNotFoundException.class, () -> itemService.save(itemDTO, 1L));
+    }
+
+    @Test
+    void saveWithInvalidArg() {
+        ItemDTO itemDTO = ItemMapper.toDTO(item);
+        itemDTO.setDescription("");
+
+        assertThrows(InvalidArgsException.class, () -> itemService.save(itemDTO, 1L));
+    }
+
+    @Test
     void update() {
         ItemDTO notUpdatedItem = new ItemDTO(1L, "Мега Дрель", "ну Очень крутая дрель", true,
                 null, 1L);
@@ -76,15 +96,46 @@ class ItemServiceImplTest {
     }
 
     @Test
+    void updateWithWrongItemId() {
+        Mockito.when(itemRepository.findById(1L)).thenReturn(Optional.empty());
+
+        ItemDTO notUpdatedItem = new ItemDTO(1L, "Мега Дрель", "ну Очень крутая дрель", true,
+                null, 1L);
+
+        assertThrows(ItemNotFoundException.class, () -> itemService.update(notUpdatedItem, 1L, 1L));
+    }
+
+    @Test
+    void updateWithAnotherOwner() {
+        ItemDTO notUpdatedItem = new ItemDTO(1L, "Мега Дрель", "ну Очень крутая дрель", false,
+                null, null);
+
+        Mockito.when(itemRepository.findById(1L)).thenReturn(Optional.ofNullable(item));
+
+        assertThrows(InvalidOwnerOfItemException.class, () -> itemService.update(notUpdatedItem, 2L, 1L));
+    }
+
+    @Test
     void addComment() {
+        CommentDTO added = itemService.addComment(commentDTO, 1L, 1L);
+        assertEquals(added.getItemId(), 1L);
+        assertEquals(added.getAuthorId(), 1L);
+        assertEquals(added.getItemId(), 1L);
+        assertEquals(added.getText(), "comment");
+        assertEquals(added.getAuthorName(), "Иван Дрель");
+        assertNotNull(added.getCreated());
+    }
 
+    @Test
+    void addWithUnknownUser() {
+        Mockito.when(userRepository.findById(any())).thenReturn(Optional.empty());
 
-    CommentDTO added = itemService.addComment(commentDTO, 1L, 1L);
-    assertEquals(added.getItemId(), 1L);
-    assertEquals(added.getAuthorId(), 1L);
-    assertEquals(added.getItemId(), 1L);
-    assertEquals(added.getText(),"comment");
-    assertEquals(added.getAuthorName(), "Иван Дрель");
-    assertTrue(added.getCreated() != null);
+        assertThrows(UserNotFoundException.class, () -> itemService.addComment(commentDTO, 2L, 1L));
+    }
+
+    @Test
+    void addWithBlankText() {
+        commentDTO.setText("");
+        assertThrows(InvalidArgsException.class, () -> itemService.addComment(commentDTO, 2L, 1L));
     }
 }

@@ -1,14 +1,13 @@
 package qwerty268.ShareIt.booking;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -16,28 +15,36 @@ import qwerty268.ShareIt.item.Item;
 import qwerty268.ShareIt.user.User;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @ExtendWith(MockitoExtension.class)
 class BookingControllerTest {
-    @Autowired
+
+
+    @InjectMocks
     BookingController bookingController;
-    @MockBean
-    BookingService bookingService;
+    @Mock
+    BookingServiceImpl bookingService;
+
 
     MockMvc mvc;
 
+    Instant instant = Instant.now();
+    Instant startInst = instant.plusSeconds(3600L);
+    Instant endInst = instant.plusSeconds(7200L);
 
-    LocalDate localDateEnd = LocalDate.of(2022, 8, 20);
-    Date end = Date.from(localDateEnd.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    Date start = Date.from(startInst);
+    Date end = Date.from(endInst);
 
-    LocalDate localDateStart = LocalDate.of(2022, 8, 15);
-    Date start = Date.from(localDateStart.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
     Booking booking = new Booking(1L, start,
             end, 1L, 1L, null);
@@ -59,6 +66,7 @@ class BookingControllerTest {
                 .standaloneSetup(bookingController)
                 .build();
 
+
     }
 
     @Test
@@ -67,30 +75,73 @@ class BookingControllerTest {
                 .thenReturn(BookingMapper.toDTO(booking, user, item));
 
         mvc.perform(post("/bookings")
-                .content(mapper.writeValueAsString(bookingDTO))
-                .characterEncoding(StandardCharsets.UTF_8)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-
-
+                        .content(mapper.writeValueAsString(bookingDTO))
+                        .header("X-Sharer-User-Id", 1L)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(1L), Long.class));
     }
 
     @Test
-    void updateBooking() {
+    void updateBooking() throws Exception {
+        Mockito.when(bookingService.update(any(), any(), any()))
+                .thenReturn(BookingMapper.toDTO(booking, user, item));
+
+        mvc.perform(patch("/bookings/1?approved=true")
+                        .header("X-Sharer-User-Id", 1L)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(1L), Long.class));
     }
 
     @Test
-    void getBooking() {
+    void getBooking() throws Exception {
+        Mockito.when(bookingService.getBooking(any(), any()))
+                .thenReturn(BookingMapper.toDTO(booking, user, item));
+
+        mvc.perform(get("/bookings/1")
+                        .header("X-Sharer-User-Id", 1L)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(1L), Long.class));
     }
 
     @Test
-    void getBookingsOfUser() {
+    void getBookingsOfUser() throws Exception {
+        List<BookingDTO> bookingDTOS = List.of(BookingMapper.toDTO(booking, user, item));
+
+        Mockito.when(bookingService.getBookingsOfUser(anyString(), anyLong(), anyInt(),  anyInt()))
+                .thenReturn(bookingDTOS);
+
+        mvc.perform(get("/bookings")
+                        .header("X-Sharer-User-Id", 1L)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id", is(1L), Long.class));
     }
 
     @Test
-    void getBookingsOfOwner() {
+    void getBookingsOfOwner() throws Exception {
+        List<BookingDTO> bookingDTOS = List.of(BookingMapper.toDTO(booking, user, item));
+
+        Mockito.when(bookingService.getBookingsForOwner(anyString(), anyLong(), anyInt(),  anyInt()))
+                .thenReturn(bookingDTOS);
+
+        mvc.perform(get("/bookings/owner")
+                        .header("X-Sharer-User-Id", 1L)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id", is(1L), Long.class));
     }
 
     private ReceivedBookingDTO createReceivedDTOFromBooking(Booking booking) {
