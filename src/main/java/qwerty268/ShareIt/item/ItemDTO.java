@@ -2,8 +2,10 @@ package qwerty268.ShareIt.item;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class ItemDTO {
     private Long id;
     private String name;

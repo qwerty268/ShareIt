@@ -65,8 +65,6 @@ class BookingControllerTest {
         mvc = MockMvcBuilders
                 .standaloneSetup(bookingController)
                 .build();
-
-
     }
 
     @Test
