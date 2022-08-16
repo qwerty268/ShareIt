@@ -16,10 +16,10 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 
     @Query(value = "SELECT * FROM Items AS I" +
             " WHERE (upper(i.description) LIKE CONCAT('%',upper(?1),'%') OR" +
-            " upper(i.name) LIKE CONCAT('%',upper(?2),'%'))" +
+            " upper(i.name) LIKE CONCAT('%',upper(?1),'%'))" +
             " AND i.is_available",
             nativeQuery = true)
-    List<Item> search(String description, String name, Pageable pageable);
+    List<Item> search(String description, Pageable pageable);
 
     List<ItemShort> findAllByOwnerId(Long ownerId);
 

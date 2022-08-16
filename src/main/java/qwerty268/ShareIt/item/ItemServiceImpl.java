@@ -119,7 +119,7 @@ public class ItemServiceImpl implements ItemService {
             return List.of();
         }
         Pageable pageable = PageRequest.of(from, size);
-        List<Item> items = itemRepository.search(text, text, pageable);
+        List<Item> items = itemRepository.search(text, pageable);
 
         List<ItemDTO> itemDTOS = new ArrayList<>();
         items.forEach(item -> itemDTOS.add(ItemMapper.toDTO(item)));
