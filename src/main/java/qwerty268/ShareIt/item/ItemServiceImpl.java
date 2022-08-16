@@ -193,7 +193,7 @@ public class ItemServiceImpl implements ItemService {
 
         if (Objects.equals(bookerId, item.getOwnerId())) {
             Booking booking = bookingRepository.findApprovedBookingForOwnerByItemId(item.getOwnerId(), item.getId());
-            List<Booking> bookings = bookingRepository.findNextBookingForOwner(item.getOwnerId(), item.getId());
+            List<Booking> bookings = bookingRepository.findNextBookingsForOwner(item.getOwnerId(), item.getId());
             if (bookings.size() != 0) {
                 lastBooking = bookings.get(0);
             }
