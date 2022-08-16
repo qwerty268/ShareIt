@@ -27,6 +27,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -70,7 +71,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(InvalidArgsException::new);
         Item item = itemRepository.findById(booking.getItemId()).orElseThrow(InvalidArgsException::new);
 
-        if (item.getOwnerId() != ownerId) {
+        if (!Objects.equals(item.getOwnerId(), ownerId)) {
             log.error("InvalidOwnerOfItemException");
             throw new InvalidOwnerOfItemException();
         }
@@ -215,7 +216,7 @@ public class BookingServiceImpl implements BookingService {
             throw new InvalidArgsException();
         }
 
-        if (booker.getId() != item.getOwnerId()) {
+        if (!Objects.equals(booker.getId(), item.getOwnerId())) {
             log.error("InvalidOwnerOfItemException");
             throw new InvalidOwnerOfItemException();
         }

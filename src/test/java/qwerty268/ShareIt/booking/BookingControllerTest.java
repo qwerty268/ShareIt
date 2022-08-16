@@ -35,30 +35,23 @@ class BookingControllerTest {
     @Mock
     BookingServiceImpl bookingService;
 
-
     MockMvc mvc;
+    final ObjectMapper mapper = new ObjectMapper();
 
     Instant instant = Instant.now();
     Instant startInst = instant.plusSeconds(3600L);
     Instant endInst = instant.plusSeconds(7200L);
-
     Date start = Date.from(startInst);
     Date end = Date.from(endInst);
-
-
     Booking booking = new Booking(1L, start,
             end, 1L, 1L, null);
-
     ReceivedBookingDTO bookingDTO = createReceivedDTOFromBooking(booking);
-
     User user = new User(
             1L,
             "John",
             "john.doe@mail.com");
-
     Item item = new Item(1L, "Lamp", "electric lamp", true, null, 1L);
 
-    final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {

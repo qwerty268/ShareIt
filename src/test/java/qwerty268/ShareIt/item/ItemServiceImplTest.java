@@ -22,6 +22,7 @@ import qwerty268.ShareIt.user.exceptions.UserNotFoundException;
 
 import javax.swing.text.html.parser.Entity;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -48,8 +49,9 @@ class ItemServiceImplTest {
     Item item = new Item(1L, "Дрель", "Очень крутая дрель", true, null, 1L);
     User user = new User(1L, "Иван Дрель", "mail@mail.ru");
 
-    LocalDate localDateEnd = LocalDate.of(2022, 6, 20);
-    Date date = Date.from(localDateEnd.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    Instant instant = Instant.now();
+
+    Date date = Date.from(instant);
 
     CommentDTO commentDTO = new CommentDTO(null, "comment", null, null, null, null);
     Booking booking = new Booking(1L, date,
