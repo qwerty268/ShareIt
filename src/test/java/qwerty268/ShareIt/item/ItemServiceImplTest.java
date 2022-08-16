@@ -15,16 +15,10 @@ import qwerty268.ShareIt.exception.InvalidArgsException;
 import qwerty268.ShareIt.item.exceptions.InvalidOwnerOfItemException;
 import qwerty268.ShareIt.item.exceptions.ItemNotFoundException;
 import qwerty268.ShareIt.user.User;
-import qwerty268.ShareIt.user.UserDTO;
-import qwerty268.ShareIt.user.UserMapper;
 import qwerty268.ShareIt.user.UserRepository;
 import qwerty268.ShareIt.user.exceptions.UserNotFoundException;
 
-import javax.swing.text.html.parser.Entity;
-
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;

@@ -13,12 +13,10 @@ import qwerty268.ShareIt.user.User;
 import qwerty268.ShareIt.user.UserRepository;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 
 @ContextConfiguration(classes = BookingServiceImpl.class)
