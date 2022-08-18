@@ -31,26 +31,26 @@ class BookingControllerTest {
 
 
     @InjectMocks
-    BookingController bookingController;
+    private BookingController bookingController;
     @Mock
-    BookingServiceImpl bookingService;
+    private BookingServiceImpl bookingService;
 
-    MockMvc mvc;
-    final ObjectMapper mapper = new ObjectMapper();
+    private MockMvc mvc;
+    private final ObjectMapper mapper = new ObjectMapper();
 
-    Instant instant = Instant.now();
-    Instant startInst = instant.plusSeconds(3600L);
-    Instant endInst = instant.plusSeconds(7200L);
-    Date start = Date.from(startInst);
-    Date end = Date.from(endInst);
-    Booking booking = new Booking(1L, start,
+    private final Instant instant = Instant.now();
+    private final Instant startInst = instant.plusSeconds(3600L);
+    private final Instant endInst = instant.plusSeconds(7200L);
+    private final Date start = Date.from(startInst);
+    private final Date end = Date.from(endInst);
+    private final Booking booking = new Booking(1L, start,
             end, 1L, 1L, null);
-    ReceivedBookingDTO bookingDTO = createReceivedDTOFromBooking(booking);
-    User user = new User(
+    private final ReceivedBookingDTO bookingDTO = createReceivedDTOFromBooking(booking);
+    private final User user = new User(
             1L,
             "John",
             "john.doe@mail.com");
-    Item item = new Item(1L, "Lamp", "electric lamp", true, null, 1L);
+    private final Item item = new Item(1L, "Lamp", "electric lamp", true, null, 1L);
 
 
     @BeforeEach
@@ -107,7 +107,7 @@ class BookingControllerTest {
     void getBookingsOfUser() throws Exception {
         List<BookingDTO> bookingDTOS = List.of(BookingMapper.toDTO(booking, user, item));
 
-        Mockito.when(bookingService.getBookingsOfUser(anyString(), anyLong(), anyInt(),  anyInt()))
+        Mockito.when(bookingService.getBookingsOfUser(anyString(), anyLong(), anyInt(), anyInt()))
                 .thenReturn(bookingDTOS);
 
         mvc.perform(get("/bookings")
@@ -123,7 +123,7 @@ class BookingControllerTest {
     void getBookingsOfOwner() throws Exception {
         List<BookingDTO> bookingDTOS = List.of(BookingMapper.toDTO(booking, user, item));
 
-        Mockito.when(bookingService.getBookingsForOwner(anyString(), anyLong(), anyInt(),  anyInt()))
+        Mockito.when(bookingService.getBookingsForOwner(anyString(), anyLong(), anyInt(), anyInt()))
                 .thenReturn(bookingDTOS);
 
         mvc.perform(get("/bookings/owner")

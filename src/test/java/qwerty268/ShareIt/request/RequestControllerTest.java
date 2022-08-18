@@ -25,15 +25,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class RequestControllerTest {
     @InjectMocks
-    RequestController requestController;
+    private RequestController requestController;
     @Mock
-    RequestServiceImpl requestService;
+    private RequestServiceImpl requestService;
 
-    ObjectMapper mapper = new ObjectMapper();
-    MockMvc mvc;
+    private final ObjectMapper mapper = new ObjectMapper();
+    private MockMvc mvc;
 
-    Request request = new Request(1L, "request", 1L);
-    RequestDTO requestDTO = RequestMapper.toDTO(request);
+    private final Request request = new Request(1L, "request", 1L);
+    private final RequestDTO requestDTO = RequestMapper.toDTO(request);
 
 
     @BeforeEach

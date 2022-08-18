@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 @SpringJUnitConfig
 class RequestServiceImplTest {
     @Autowired
-    RequestService requestService;
+    private RequestService requestService;
 
     @MockBean
     RequestRepository requestRepository;
@@ -34,9 +34,9 @@ class RequestServiceImplTest {
     @MockBean
     ItemRepository itemRepository;
 
-    RequestDTO requestDTO = new RequestDTO(1L, "Ка же я хочу дрель", 1L, null);
-    User user = new User(1L, "Иван Дрель", "aaaaaaaк@mial.ru");
-    Instant instant = Instant.now();
+    private final RequestDTO requestDTO = new RequestDTO(1L, "Ка же я хочу дрель", 1L, null);
+    private final User user = new User(1L, "Иван Дрель", "aaaaaaaк@mial.ru");
+    private final Instant instant = Instant.now();
 
     @BeforeEach
     public void createMockBehavior() {

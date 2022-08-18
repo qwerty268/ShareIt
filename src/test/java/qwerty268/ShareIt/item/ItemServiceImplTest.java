@@ -29,26 +29,26 @@ import static org.mockito.ArgumentMatchers.any;
 @SpringBootTest
 class ItemServiceImplTest {
     @Autowired
-    ItemService itemService;
+    private ItemService itemService;
 
     @MockBean
-    ItemRepository itemRepository;
+    private ItemRepository itemRepository;
     @MockBean
-    BookingRepository bookingRepository;
+    private BookingRepository bookingRepository;
     @MockBean
-    CommentRepository commentRepository;
+    private CommentRepository commentRepository;
     @MockBean
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
-    Item item = new Item(1L, "Дрель", "Очень крутая дрель", true, null, 1L);
-    User user = new User(1L, "Иван Дрель", "mail@mail.ru");
+    private final Item item = new Item(1L, "Дрель", "Очень крутая дрель", true, null, 1L);
+    private final User user = new User(1L, "Иван Дрель", "mail@mail.ru");
 
-    Instant instant = Instant.now();
+    private final Instant instant = Instant.now();
 
-    Date date = Date.from(instant);
+    private final Date date = Date.from(instant);
 
-    CommentDTO commentDTO = new CommentDTO(null, "comment", null, null, null, null);
-    Booking booking = new Booking(1L, date,
+    private final CommentDTO commentDTO = new CommentDTO(null, "comment", null, null, null, null);
+    private final Booking booking = new Booking(1L, date,
             date, 1L, 1L, Status.APPROVED);
 
     @BeforeEach

@@ -20,7 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 class UserServiceImplTest {
 
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     @MockBean
     UserRepository userRepository;
@@ -30,8 +30,11 @@ class UserServiceImplTest {
             "John",
             "john.doe@mail.com");
 
+    UserServiceImplTest() {
+    }
+
     @Test
-    void add() {
+     void add() {
         Mockito.when(userRepository.save(any())).thenReturn(user);
         assertEquals(UserMapper.toDTO(user), userService.add(UserMapper.toDTO(user)));
     }

@@ -26,19 +26,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ItemControllerTest {
 
     @Mock
-    ItemServiceImpl itemService;
+    private ItemServiceImpl itemService;
     @InjectMocks
-    ItemController itemController;
+    private ItemController itemController;
 
-    MockMvc mvc;
-    final ObjectMapper mapper = new ObjectMapper();
+    private MockMvc mvc;
+    private final ObjectMapper mapper = new ObjectMapper();
 
-    ItemDTO item = new ItemDTO(1L, "Дрель", "Очень крутая дрель", true, null, 1L);
+    private final ItemDTO item = new ItemDTO(1L, "Дрель", "Очень крутая дрель", true, null, 1L);
 
-    ItemWithBookingsAndCommentsDTO itemDTO = new ItemWithBookingsAndCommentsDTO(1L, null, null, null, null, null,
+    private final ItemWithBookingsAndCommentsDTO itemDTO = new ItemWithBookingsAndCommentsDTO(1L, null, null, null, null, null,
             null, null, null);
 
-    CommentDTO commentDTO = new CommentDTO(1L, "comment", null, null, null, null);
+    private final CommentDTO commentDTO = new CommentDTO(1L, "comment", null, null, null, null);
 
 
     @BeforeEach

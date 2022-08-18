@@ -23,32 +23,32 @@ import static org.mockito.ArgumentMatchers.any;
 @SpringJUnitConfig
 class BookingServiceImplTest {
     @Autowired
-    BookingService bookingService;
+    private BookingService bookingService;
 
     @MockBean
-    BookingRepository bookingRepository;
+    private BookingRepository bookingRepository;
     @MockBean
-    ItemRepository itemRepository;
+    private ItemRepository itemRepository;
     @MockBean
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
 
-    Instant instant = Instant.now();
-    Instant startInst = instant.plusSeconds(3600L);
-    Instant endInst = instant.plusSeconds(7200L);
+    private final Instant instant = Instant.now();
+    private final Instant startInst = instant.plusSeconds(3600L);
+    private final Instant endInst = instant.plusSeconds(7200L);
 
-    Date start = Date.from(startInst);
-    Date end = Date.from(endInst);
-    Booking booking = new Booking(1L, start,
+    private final Date start = Date.from(startInst);
+    private final Date end = Date.from(endInst);
+    private final Booking booking = new Booking(1L, start,
             end, 1L, 1L, null);
-    ReceivedBookingDTO receivedBookingDTO = createReceivedDTOFromBooking(booking);
+    private final ReceivedBookingDTO receivedBookingDTO = createReceivedDTOFromBooking(booking);
 
 
-    User user = new User(
+    private final User user = new User(
             1L,
             "John",
             "john.doe@mail.com");
-    Item item = new Item(1L, "Lamp", "electric lamp", true, null, 1L);
+    private final Item item = new Item(1L, "Lamp", "electric lamp", true, null, 1L);
 
 
     @BeforeEach

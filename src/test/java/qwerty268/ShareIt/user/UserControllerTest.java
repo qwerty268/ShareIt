@@ -25,18 +25,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
     @InjectMocks
-    UserController userController;
+    private UserController userController;
     @Mock
-    UserServiceImpl userService;
+    private UserServiceImpl userService;
 
-    MockMvc mvc;
-    ObjectMapper mapper = new ObjectMapper();
+    private MockMvc mvc;
+    private final ObjectMapper mapper = new ObjectMapper();
 
-    User user = new User(
+    private final User user = new User(
             1L,
             "John",
             "john.doe@mail.com");
-    UserDTO userDTO = UserMapper.toDTO(user);
+    private final UserDTO userDTO = UserMapper.toDTO(user);
 
     @BeforeEach
     void setUp() {
