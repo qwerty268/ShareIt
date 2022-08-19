@@ -2,6 +2,9 @@ package qwerty268.ShareIt.item;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import qwerty268.ShareIt.booking.Booking;
 import qwerty268.ShareIt.booking.BookingRepository;
@@ -14,6 +17,7 @@ import qwerty268.ShareIt.exception.InvalidArgsException;
 import qwerty268.ShareIt.item.exceptions.InvalidOwnerOfItemException;
 import qwerty268.ShareIt.item.exceptions.ItemNotFoundException;
 import qwerty268.ShareIt.user.UserRepository;
+import qwerty268.ShareIt.user.exceptions.UserNotFoundException;
 
 import javax.transaction.Transactional;
 import java.time.Instant;
@@ -43,7 +47,9 @@ public class ItemServiceImpl implements ItemService {
     public ItemDTO save(ItemDTO itemDTO, Long userId) {
         Item item = ItemMapper.fromDTO(itemDTO, userId);
         item.setOwnerId(userId);
-        validateItem(item, userId);
+
+        validateOwnerOfItem(item, userId);
+        validateItem(item);
 
         item = itemRepository.save(item);
         log.info("Предмет сохранён");
@@ -53,11 +59,16 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemDTO update(ItemDTO itemDTO, Long userId, Long itemId) {
+        Item notUpdatedItem = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
+
+
+
+        validateOwnerOfItem(notUpdatedItem, userId);
+        validateItem(notUpdatedItem);
+
         Item item = ItemMapper.fromDTO(itemDTO, userId);
-        Item notUpdatedItem = itemRepository.findById(itemId).orElseThrow(InvalidOwnerOfItemException::new);
         Item updatedItem = ItemMapper.update(notUpdatedItem, item);
 
-        validateItem(item, userId);
 
         itemRepository.save(updatedItem);
         log.info("Предмет обновлён");
@@ -65,9 +76,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemWithBookingsAndCommentsDTO> findAll(Long userId) {
+    public List<ItemWithBookingsAndCommentsDTO> findAll(Long userId, int from, int size) {
+        Pageable pageable = PageRequest.of(from, size, Sort.by("id"));
 
-        List<Item> items = itemRepository.findItemsByOwnerId(userId);
+        List<Item> items = itemRepository.findItemsByOwnerId(userId, pageable);
 
         List<ItemWithBookingsAndCommentsDTO> itemWithBookingDatesDTOS = new ArrayList<>();
 
@@ -81,7 +93,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemWithBookingsAndCommentsDTO findById(Long itemId, Long bookerId) {
-        Item item = itemRepository.findItemById(itemId).orElseThrow(ItemNotFoundException::new);
+        Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
 
         ItemWithBookingsAndCommentsDTO itemWithBookingsAndCommentsDTO = createDTO(item, bookerId);
         log.info("Предметы возвращены");
@@ -91,7 +103,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public void deleteById(Long itemId, Long userId) {
-        if (itemRepository.findItemById(itemId).get().getOwnerId() == userId) {
+        if (Objects.equals(itemRepository.findById(itemId).get().getOwnerId(), userId)) {
 
             itemRepository.deleteById(itemId);
             log.info("Предмет удалён");
@@ -102,12 +114,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDTO> findItemsByParam(String text) {
+    public List<ItemDTO> findItemsByParam(String text, int from, int size) {
         if (text.equals("")) {
             return List.of();
         }
-
-        List<Item> items = itemRepository.search(text, text);
+        Pageable pageable = PageRequest.of(from, size);
+        List<Item> items = itemRepository.search(text, pageable);
 
         List<ItemDTO> itemDTOS = new ArrayList<>();
         items.forEach(item -> itemDTOS.add(ItemMapper.toDTO(item)));
@@ -120,7 +132,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public CommentDTO addComment(CommentDTO commentDTO, Long userId, Long itemId) {
         Comment comment = CommentMapper.fromDTO(commentDTO);
+        comment.setAuthorId(userId);
         comment.setItemId(itemId);
+        comment.setCreated(Date.from(Instant.now()));
 
         validateComment(comment, userId);
 
@@ -132,9 +146,8 @@ public class ItemServiceImpl implements ItemService {
         }
         Booking booking = bookings.get(0);
 
-
-        if (booking.getStart().toInstant().isBefore(Instant.now())) {
-            comment = commentRepository.save(comment);
+        if (booking.getStart().before(Date.from(Instant.now()))) {
+            commentRepository.save(comment);
         } else {
             throw new InvalidArgsException();
         }
@@ -143,24 +156,29 @@ public class ItemServiceImpl implements ItemService {
         return CommentMapper.toDTO(comment, userRepository.findById(comment.getAuthorId()).get().getName());
     }
 
-    private void validateItem(Item item, Long userId) {
-        userRepository.findById(userId).orElseThrow(InvalidOwnerOfItemException::new);
-
+    private void validateItem(Item item) {
         if (item.getName() == null ||
                 item.getName().isBlank() ||
                 item.getDescription() == null ||
+                item.getDescription().isBlank() ||
                 item.getIsAvailable() == null) {
             log.error("InvalidArgsException");
             throw new InvalidArgsException();
         }
-        if (!Objects.equals(item.getOwnerId(), userId)) {
+    }
+
+    private void validateOwnerOfItem(Item item, Long ownerId) {
+        userRepository.findById(ownerId).orElseThrow(UserNotFoundException::new);
+
+        if (!Objects.equals(item.getOwnerId(), ownerId)) {
             log.error("ItemNotFoundException");
-            throw new ItemNotFoundException();
+            throw new InvalidOwnerOfItemException();
         }
     }
 
     private void validateComment(Comment comment, Long userId) {
-        userRepository.findById(userId).orElseThrow(InvalidArgsException::new);
+        userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
         if (comment.getText() == null || Objects.equals(comment.getText(), "")) {
             log.error("InvalidArgsException");
             throw new InvalidArgsException();
@@ -173,9 +191,9 @@ public class ItemServiceImpl implements ItemService {
         Booking futureBooking = null;
         Booking lastBooking = null;
 
-        if (bookerId == item.getOwnerId()) {
+        if (Objects.equals(bookerId, item.getOwnerId())) {
             Booking booking = bookingRepository.findApprovedBookingForOwnerByItemId(item.getOwnerId(), item.getId());
-            List<Booking> bookings = bookingRepository.findNextBookingForOwner(item.getOwnerId(), item.getId());
+            List<Booking> bookings = bookingRepository.findNextBookingsForOwner(item.getOwnerId(), item.getId());
             if (bookings.size() != 0) {
                 lastBooking = bookings.get(0);
             }
