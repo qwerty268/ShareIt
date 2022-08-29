@@ -22,11 +22,11 @@ public class ItemController {
         return service.save(itemDTO, userId);
     }
 
-    @PatchMapping("/items/{id}")
+    @PatchMapping("/items/{itemId}")
     @ResponseBody
-    public ItemDTO updateItem(@PathVariable Long id, @RequestBody ItemDTO itemDTO,
+    public ItemDTO updateItem(@PathVariable Long itemId, @RequestBody ItemDTO itemDTO,
                               @RequestHeader("X-Sharer-User-Id") Long userId) {
-        return service.update(itemDTO, userId, id);
+        return service.update(itemDTO, userId, itemId);
     }
 
     @GetMapping("/items")
@@ -50,7 +50,7 @@ public class ItemController {
 
     @GetMapping("/items/search")
     @ResponseBody
-    public List<ItemDTO> findItems(@RequestParam String text,
+    public List<ItemDTO> findItemsByParam(@RequestParam String text,
                                    @RequestParam(defaultValue = "0", required = false) Integer from,
                                    @RequestParam(defaultValue = "5", required = false) Integer size) {
         return service.findItemsByParam(text, from, size);
