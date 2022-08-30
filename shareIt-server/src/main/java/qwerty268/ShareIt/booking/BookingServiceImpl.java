@@ -25,7 +25,6 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -52,7 +51,7 @@ public class BookingServiceImpl implements BookingService {
 
         User booker = userRepository.findById(bookerId).orElseThrow(UserDoesNotExistException::new);
         Item item = itemRepository.findById(booking.getItemId()).orElseThrow(ItemNotFoundException::new);
-        validate(booking, booker, item);
+        validate(booker, item);
 
 
         if (item.getIsAvailable() == Boolean.FALSE) {
@@ -98,7 +97,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(BookingNotFoundException::new);
 
         Item item = itemRepository.findById(booking.getItemId()).orElseThrow(InvalidArgsException::new);
-        if (item.getOwnerId() == userId || booking.getBookerId() == userId) {
+        if (Objects.equals(item.getOwnerId(), userId) || Objects.equals(booking.getBookerId(), userId)) {
             log.info("Брони пользователя вохвращены");
             return createBookingDTO(booking);
         }
@@ -208,14 +207,7 @@ public class BookingServiceImpl implements BookingService {
                         itemRepository.findById(booking.getItemId()).orElseThrow(InvalidArgsException::new));
     }
 
-    private void validate(Booking booking, User booker, Item item) {
-        if (booking.getEnd().before(Date.from(Instant.now())) ||
-                booking.getEnd().before(booking.getStart()) ||
-                booking.getStart().before(Date.from(Instant.now()))) {
-            log.error("InvalidArgsException");
-            throw new InvalidArgsException();
-        }
-
+    private void validate(User booker, Item item) {
         if (!Objects.equals(booker.getId(), item.getOwnerId())) {
             log.error("InvalidOwnerOfItemException");
             throw new InvalidOwnerOfItemException();

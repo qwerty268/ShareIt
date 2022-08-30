@@ -26,9 +26,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO add(UserDTO userDTO) {
         User user = UserMapper.fromDTO(userDTO);
-
-        validate(user);
-
+        
         user = repository.save(user);
         log.info("Пользователь сохранён");
         return UserMapper.toDTO(user);
@@ -44,7 +42,6 @@ public class UserServiceImpl implements UserService {
         UserMapper.updateUser(notUpdatedUser, user);
 
         user = repository.save(user);
-        validate(user);
         log.info("Пользователь обновлён");
         return UserMapper.toDTO(user);
     }
@@ -72,13 +69,6 @@ public class UserServiceImpl implements UserService {
         log.info("Пользователь удалён");
     }
 
-
-    private void validate(User user) {
-        if (!EmailValidator.getInstance().isValid(user.getEmail())) {
-            log.error("InvalidArgsException");
-            throw new InvalidArgsException();
-        }
-    }
 }
 
 

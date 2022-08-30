@@ -49,7 +49,6 @@ public class ItemServiceImpl implements ItemService {
         item.setOwnerId(userId);
 
         validateOwnerOfItem(item, userId);
-        validateItem(item);
 
         item = itemRepository.save(item);
         log.info("Предмет сохранён");
@@ -61,10 +60,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDTO update(ItemDTO itemDTO, Long userId, Long itemId) {
         Item notUpdatedItem = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
 
-
-
         validateOwnerOfItem(notUpdatedItem, userId);
-        validateItem(notUpdatedItem);
 
         Item item = ItemMapper.fromDTO(itemDTO, userId);
         Item updatedItem = ItemMapper.update(notUpdatedItem, item);
@@ -136,7 +132,7 @@ public class ItemServiceImpl implements ItemService {
         comment.setItemId(itemId);
         comment.setCreated(Date.from(Instant.now()));
 
-        validateComment(comment, userId);
+        validateUser(userId);
 
         List<Booking> bookings = bookingRepository
                 .findBookingsByItemIdAndBookerIdAndStatusOrderByEndDesc(comment.getItemId(), userId, Status.APPROVED);
@@ -156,16 +152,6 @@ public class ItemServiceImpl implements ItemService {
         return CommentMapper.toDTO(comment, userRepository.findById(comment.getAuthorId()).get().getName());
     }
 
-    private void validateItem(Item item) {
-        if (item.getName() == null ||
-                item.getName().isBlank() ||
-                item.getDescription() == null ||
-                item.getDescription().isBlank() ||
-                item.getIsAvailable() == null) {
-            log.error("InvalidArgsException");
-            throw new InvalidArgsException();
-        }
-    }
 
     private void validateOwnerOfItem(Item item, Long ownerId) {
         userRepository.findById(ownerId).orElseThrow(UserNotFoundException::new);
@@ -176,13 +162,9 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-    private void validateComment(Comment comment, Long userId) {
+    private void validateUser(Long userId) {
         userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-        if (comment.getText() == null || Objects.equals(comment.getText(), "")) {
-            log.error("InvalidArgsException");
-            throw new InvalidArgsException();
-        }
     }
 
     private ItemWithBookingsAndCommentsDTO createDTO(Item item, Long bookerId) {

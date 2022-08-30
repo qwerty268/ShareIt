@@ -27,7 +27,7 @@ public class BookingController {
     @ResponseBody
     public ResponseEntity<Object> addBooking(@RequestBody ReceivedBookingDTO bookingDTO,
                                  @RequestHeader("X-Sharer-User-Id") @Min(0) Long userId) {
-        validate(bookingDTO);
+        validateBooking(bookingDTO);
         return bookingClient.addBooking(bookingDTO, userId);
     }
 
@@ -66,7 +66,7 @@ public class BookingController {
     }
 
 
-    private void validate(ReceivedBookingDTO booking) {
+    private void validateBooking(ReceivedBookingDTO booking) {
         if (booking.getEnd().before(Date.from(Instant.now())) ||
                 booking.getEnd().before(booking.getStart()) ||
                 booking.getStart().before(Date.from(Instant.now()))) {

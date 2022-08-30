@@ -37,7 +37,6 @@ public class RequestServiceImpl implements RequestService {
     @Transactional
     public RequestDTO addRequest(RequestDTO requestDTO, Long requestorId) {
         checkUser(requestorId);
-        validateRequest(requestDTO);
 
         requestDTO.setRequestorId(requestorId);
 
@@ -92,11 +91,6 @@ public class RequestServiceImpl implements RequestService {
         userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }
 
-    private void validateRequest(RequestDTO requestDTO) {
-        if (requestDTO.getDescription() == null || Objects.equals(requestDTO.getDescription(), "")) {
-            throw new InvalidArgsException();
-        }
-    }
 
     //добавление списка предметов реквесту
     private RequestDTO createDTOWithItems(Request request) {
