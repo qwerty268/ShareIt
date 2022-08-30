@@ -40,12 +40,7 @@ class UserServiceImplTest {
         Assertions.assertEquals(UserMapper.toDTO(user), userService.add(UserMapper.toDTO(user)));
     }
 
-    @Test
-    void addUserWithFailEmail() {
-        User newUser = new User(1L, "John", "notValid.com");
 
-        assertThrows(InvalidArgsException.class, () -> userService.add(UserMapper.toDTO(newUser)));
-    }
 
     @Test
     void update() {

@@ -60,10 +60,4 @@ class RequestServiceImplTest {
                 () -> requestService.addRequest(requestDTO, requestDTO.getRequestorId()));
     }
 
-    @Test
-    void addRequestWithInvalidArgs() {
-        RequestDTO wrongRequest = new RequestDTO(1L, "", 1L, null);
-        assertThrows(InvalidArgsException.class,
-                () -> requestService.addRequest(wrongRequest, requestDTO.getRequestorId()));
-    }
 }

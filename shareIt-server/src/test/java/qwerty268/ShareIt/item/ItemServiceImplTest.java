@@ -75,13 +75,6 @@ class ItemServiceImplTest {
         assertThrows(UserNotFoundException.class, () -> itemService.save(itemDTO, 1L));
     }
 
-    @Test
-    void saveWithInvalidArg() {
-        ItemDTO itemDTO = ItemMapper.toDTO(item);
-        itemDTO.setDescription("");
-
-        assertThrows(InvalidArgsException.class, () -> itemService.save(itemDTO, 1L));
-    }
 
     @Test
     void update() {
@@ -129,9 +122,5 @@ class ItemServiceImplTest {
         assertThrows(UserNotFoundException.class, () -> itemService.addComment(commentDTO, 2L, 1L));
     }
 
-    @Test
-    void addWithBlankText() {
-        commentDTO.setText("");
-        assertThrows(InvalidArgsException.class, () -> itemService.addComment(commentDTO, 2L, 1L));
-    }
+
 }
