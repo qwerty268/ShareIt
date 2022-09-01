@@ -23,9 +23,3 @@ public class ExceptionController {
         return Map.of("Error message", String.format(e.getMessage()));
     }
 }
-
-//@ExceptionHandler
-//    @ResponseStatus(HttpStatus.NOT_FOUND)
-//    public String handleFilmDoesNotExistException(final FilmDoesNotExistException e) {
-//        return e.getMessage();
-//    }

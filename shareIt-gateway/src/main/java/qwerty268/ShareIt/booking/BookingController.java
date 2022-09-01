@@ -27,6 +27,7 @@ public class BookingController {
     @ResponseBody
     public ResponseEntity<Object> addBooking(@RequestBody ReceivedBookingDTO bookingDTO,
                                  @RequestHeader("X-Sharer-User-Id") @Min(0) Long userId) {
+        log.info("Получен post запрос");
         validateBooking(bookingDTO);
         return bookingClient.addBooking(bookingDTO, userId);
     }
@@ -35,6 +36,7 @@ public class BookingController {
     @ResponseBody
     public ResponseEntity<Object> updateBooking(@RequestHeader("X-Sharer-User-Id") @Min(0) Long userId,
                                     @RequestParam("approved") Boolean status, @PathVariable @Min(0) Long bookingId) {
+        log.info("Получен patch request");
         return bookingClient.update(userId, status, bookingId);
     }
 
@@ -42,6 +44,7 @@ public class BookingController {
     @ResponseBody
     public ResponseEntity<Object> getBooking(@RequestHeader("X-Sharer-User-Id") @Min(0) Long userId,
                                  @PathVariable @Min(0) Long bookingId) {
+        log.info("Получен getBooking request");
         return bookingClient.getBooking(userId, bookingId);
     }
 
@@ -52,6 +55,7 @@ public class BookingController {
             @RequestHeader("X-Sharer-User-Id") @Min(0) Long userId,
             @RequestParam(defaultValue = "0", required = false) Integer from,
             @RequestParam(defaultValue = "5", required = false) Integer size) {
+        log.info("Получен getBookingsOfUser request");
         return bookingClient.getBookingsOfUser(state, userId, from, size);
     }
 
@@ -62,6 +66,7 @@ public class BookingController {
             @RequestHeader("X-Sharer-User-Id") @Min(0) Long userId,
             @RequestParam(defaultValue = "0", required = false) Integer from,
             @RequestParam(defaultValue = "5", required = false) Integer size) {
+        log.info(" Получен getBookingsOfOwner");
         return bookingClient.getBookingsForOwner(state, userId, from, size);
     }
 
@@ -73,5 +78,6 @@ public class BookingController {
             log.error("InvalidArgsException");
             throw new InvalidArgsException();
         }
+        log.info("Валидация пройдена");
     }
 }

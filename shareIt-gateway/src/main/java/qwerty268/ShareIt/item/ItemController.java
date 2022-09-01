@@ -10,7 +10,6 @@ import qwerty268.ShareIt.exceptions.InvalidArgsException;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import java.util.List;
 
 @Slf4j
 @Validated
@@ -27,6 +26,7 @@ public class ItemController {
     @PostMapping("/items")
     @ResponseBody
     public ResponseEntity<Object> saveItem(@RequestBody ItemDTO itemDTO, @RequestHeader("X-Sharer-User-Id") @Min(0) Long userId) {
+        log.info("Получен post request");
         validateItem(itemDTO);
         return itemClient.save(itemDTO, userId);
     }
@@ -35,6 +35,7 @@ public class ItemController {
     @ResponseBody
     public ResponseEntity<Object> updateItem(@PathVariable @Min(0) Long id, @RequestBody ItemDTO itemDTO,
                               @RequestHeader("X-Sharer-User-Id") @Min(0) Long userId) {
+        log.info("Получен updateItem request");
         validateItem(itemDTO);
         return itemClient.update(itemDTO, userId, id);
     }
@@ -44,6 +45,7 @@ public class ItemController {
     public ResponseEntity<Object> findItems(@RequestHeader("X-Sharer-User-Id") @Min(0) Long userId,
                                                           @RequestParam(defaultValue = "0", required = false) Integer from,
                                                           @RequestParam(defaultValue = "5", required = false) Integer size) {
+        log.info("Получен findItems request");
         return itemClient.findAll(userId, from, size);
     }
 
@@ -51,11 +53,13 @@ public class ItemController {
     @ResponseBody
     public ResponseEntity<Object> getItem(@PathVariable @Min(0) Long itemId,
                                                   @RequestHeader("X-Sharer-User-Id") @Min(0) Long bookerId) {
+        log.info("Получен getItem request");
         return itemClient.findById(itemId, bookerId);
     }
 
     @DeleteMapping("/items/{itemId}")
     public void deleteItem(@PathVariable @Min(0) Long itemId, @RequestHeader("X-Sharer-User-Id") @Min(0) Long userId) {
+        log.info("Получен deleteItem request");
         itemClient.deleteById(itemId, userId);
     }
 
@@ -64,6 +68,7 @@ public class ItemController {
     public ResponseEntity<Object> findItemsByParam(@RequestParam @NotBlank String text,
                                    @RequestParam(defaultValue = "0", required = false) Integer from,
                                    @RequestParam(defaultValue = "5", required = false) Integer size) {
+        log.info("Получен findItemsByParam request");
         return itemClient.findItemsByParam(text, from, size);
     }
 
@@ -72,6 +77,7 @@ public class ItemController {
     public ResponseEntity<Object> addComment(@RequestHeader("X-Sharer-User-Id") @Min(0) Long userId,
                                  @RequestBody CommentDTO commentDTO,
                                  @PathVariable @Min(0) Long itemId) {
+        log.info("Получен addComment request");
         validateComment(commentDTO);
         return itemClient.addComment(commentDTO, userId, itemId);
     }
@@ -85,6 +91,7 @@ public class ItemController {
             log.error("InvalidArgsException");
             throw new InvalidArgsException();
         }
+        log.info("Валидация пройдена");
     }
 
     private void validateComment(CommentDTO commentDTO) {
@@ -92,5 +99,6 @@ public class ItemController {
             log.error("InvalidArgsException");
             throw new InvalidArgsException();
         }
+        log.info("Валидация пройдена");
     }
 }
